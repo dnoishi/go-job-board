@@ -1,0 +1,25 @@
+{{define "yield"}}
+
+<div class="row">
+
+  <div class="col-md-12">
+    <h1>
+      {{.Title}}
+    </h1>
+    <hr>
+  </div>
+</div>
+
+<div class="row">
+  {{range .ImageSplitN 3}}
+  <div class="col-md-4">
+    {{range .}}
+    <a href="{{.Path}}">
+      <img src="{{.Path}}" class="thumbnail" />
+    </a>
+    {{end}}
+  </div>
+  {{end}}
+</div>
+
+{{end}}

@@ -1,0 +1,13 @@
+{
+  "port": 4000,
+  "env": "dev",
+  "pepper": "your-pepper",
+  "hmacKey": "the-secret-key",
+  "database": {
+    "host": "localhost",
+    "port": 5432,
+    "user": "your-db-user",
+    "password": "your-db-password",
+    "dbname": "your-db-name"
+  }
+}
