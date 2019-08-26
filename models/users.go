@@ -7,8 +7,8 @@ import (
 
 	"github.com/jinzhu/gorm"
 
-	"github.com/samueldaviddelacruz/lenslocked.com/hash"
-	"github.com/samueldaviddelacruz/lenslocked.com/rand"
+	"github.com/samueldaviddelacruz/go-job-board/hash"
+	"github.com/samueldaviddelacruz/go-job-board/rand"
 
 	"golang.org/x/crypto/bcrypt"
 )

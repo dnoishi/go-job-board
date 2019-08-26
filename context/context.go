@@ -3,7 +3,7 @@ package context
 import (
 	"context"
 
-	"github.com/samueldaviddelacruz/lenslocked.com/models"
+	"github.com/samueldaviddelacruz/go-job-board/models"
 )
 
 const (

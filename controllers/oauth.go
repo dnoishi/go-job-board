@@ -8,11 +8,11 @@ import (
 
 	"github.com/gorilla/mux"
 
-	llctx "github.com/samueldaviddelacruz/lenslocked.com/context"
-	"github.com/samueldaviddelacruz/lenslocked.com/dbx"
+	llctx "github.com/samueldaviddelacruz/go-job-board/context"
+	"github.com/samueldaviddelacruz/go-job-board/dbx"
 
 	"github.com/gorilla/csrf"
-	"github.com/samueldaviddelacruz/lenslocked.com/models"
+	"github.com/samueldaviddelacruz/go-job-board/models"
 	"golang.org/x/oauth2"
 )
 

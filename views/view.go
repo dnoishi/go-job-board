@@ -11,7 +11,7 @@ import (
 
 	"github.com/gorilla/csrf"
 
-	"github.com/samueldaviddelacruz/lenslocked.com/context"
+	"github.com/samueldaviddelacruz/go-job-board/context"
 )
 
 var (

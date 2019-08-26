@@ -4,13 +4,13 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/samueldaviddelacruz/lenslocked.com/email"
+	"github.com/samueldaviddelacruz/go-job-board/email"
 
-	"github.com/samueldaviddelacruz/lenslocked.com/context"
-	"github.com/samueldaviddelacruz/lenslocked.com/models"
-	"github.com/samueldaviddelacruz/lenslocked.com/rand"
+	"github.com/samueldaviddelacruz/go-job-board/context"
+	"github.com/samueldaviddelacruz/go-job-board/models"
+	"github.com/samueldaviddelacruz/go-job-board/rand"
 
-	"github.com/samueldaviddelacruz/lenslocked.com/views"
+	"github.com/samueldaviddelacruz/go-job-board/views"
 )
 
 // NewUsers is used to create a new Users controller.

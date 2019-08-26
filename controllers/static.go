@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"github.com/samueldaviddelacruz/lenslocked.com/views"
+	"github.com/samueldaviddelacruz/go-job-board/views"
 )
 
 func NewStatic() *Static {

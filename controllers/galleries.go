@@ -10,9 +10,9 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"github.com/samueldaviddelacruz/lenslocked.com/context"
-	"github.com/samueldaviddelacruz/lenslocked.com/models"
-	"github.com/samueldaviddelacruz/lenslocked.com/views"
+	"github.com/samueldaviddelacruz/go-job-board/context"
+	"github.com/samueldaviddelacruz/go-job-board/models"
+	"github.com/samueldaviddelacruz/go-job-board/views"
 )
 
 const (
