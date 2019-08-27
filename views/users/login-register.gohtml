@@ -1,0 +1,104 @@
+
+{{define "yield"}}
+<!-- Page Header Start -->
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="breadcrumb-wrapper">
+                <h2 class="product-title">Login or Sign up</h2>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Page Header End -->
+
+<div id="content" class="my-account">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3 col-sm-6 col-sm-offset-6 cd-user-modal">
+                <div class="my-account-form">
+                    <ul class="cd-switcher">
+                        <li><a class="selected" href="#0">LOGIN</a></li>
+                        <li><a href="#0" class="">SIGN UP</a></li>
+                    </ul>
+
+                    <div id="cd-login" class="is-selected">
+                        {{template "loginForm"}}
+                    </div>
+
+                    <div id="cd-signup" class="">
+                        {{template "signupForm"}}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}
+
+
+{{define "signupForm"}}
+    <div class="page-login-form register">
+        <form role="form" class="login-form">
+            {{csrfField}}
+            <div class="form-group is-empty">
+                <div class="input-icon">
+                    <i class="ti-user"></i>
+                    <input type="text" id="sender-email" class="form-control" name="name" placeholder="Username">
+                </div>
+                <span class="material-input"></span>
+            </div>
+            <div class="form-group is-empty">
+                <div class="input-icon">
+                    <i class="ti-email"></i>
+                    <input type="text" id="sender-email" class="form-control" name="email" placeholder="Email">
+                </div>
+                <span class="material-input"></span>
+            </div>
+            <div class="form-group is-empty">
+                <div class="input-icon">
+                    <i class="ti-lock"></i>
+                    <input type="password" class="form-control" placeholder="Password">
+                </div>
+                <span class="material-input"></span>
+            </div>
+            <div class="form-group is-empty">
+                <div class="input-icon">
+                    <i class="ti-lock"></i>
+                    <input type="password" class="form-control" placeholder="Repeat Password">
+                </div>
+                <span class="material-input"></span>
+            </div>
+            <button class="btn btn-common log-btn">Register</button>
+        </form>
+    </div>
+{{end}}
+
+
+
+{{define "loginForm"}}
+    <div class="page-login-form">
+        <form role="form" class="login-form">
+            {{csrfField}}
+            <div class="form-group is-empty">
+                <div class="input-icon">
+                    <i class="ti-user"></i>
+                    <input type="text" id="sender-email" class="form-control" name="email" placeholder="Username">
+                </div>
+                <span class="material-input"></span>
+            </div>
+            <div class="form-group is-empty">
+                <div class="input-icon">
+                    <i class="ti-lock"></i>
+                    <input type="password" class="form-control" placeholder="Password">
+                </div>
+                <span class="material-input"></span>
+            </div>
+            <button class="btn btn-common log-btn">Login</button>
+            <div class="checkbox-item">
+                <a href="/forgot">Lost your password?</a>
+            </div>
+        </form>
+    </div>
+{{end}}

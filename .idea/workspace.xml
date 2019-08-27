@@ -2,22 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="105ea2a6-54db-4d7e-a3db-abad67e52a44" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/controllers/jobs.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/views/jobs/search.gohtml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/views/users/login-register.gohtml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/css/main.css" beforeDir="false" afterPath="$PROJECT_DIR$/assets/css/main.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/context/context.go" beforeDir="false" afterPath="$PROJECT_DIR$/context/context.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controllers/galleries.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/galleries.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controllers/oauth.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/oauth.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/controllers/static.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/static.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/controllers/users.go" beforeDir="false" afterPath="$PROJECT_DIR$/controllers/users.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/exp/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/exp/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/middleware/require_user.go" beforeDir="false" afterPath="$PROJECT_DIR$/middleware/require_user.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/password_reset.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/password_reset.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/users.go" beforeDir="false" afterPath="$PROJECT_DIR$/models/users.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/views/data.go" beforeDir="false" afterPath="$PROJECT_DIR$/views/data.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/views/view.go" beforeDir="false" afterPath="$PROJECT_DIR$/views/view.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/jobs/search.gohtml" beforeDir="false" afterPath="$PROJECT_DIR$/views/jobs/search.gohtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/layouts/navbar.gohtml" beforeDir="false" afterPath="$PROJECT_DIR$/views/layouts/navbar.gohtml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/users/forgot_pw.gohtml" beforeDir="false" afterPath="$PROJECT_DIR$/views/users/forgot_pw.gohtml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -30,11 +20,20 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.go">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="543">
-              <caret line="93" column="22" selection-start-line="93" selection-start-column="22" selection-end-line="93" selection-end-column="22" />
+            <state relative-caret-position="303">
+              <caret line="71" column="55" selection-start-line="71" selection-start-column="4" selection-end-line="71" selection-end-column="55" />
               <folding>
                 <element signature="e#14#414#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/views/layouts/navbar.gohtml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="139">
+              <caret line="20" column="28" selection-start-line="20" selection-start-column="28" selection-end-line="20" selection-end-column="28" />
             </state>
           </provider>
         </entry>
@@ -49,16 +48,31 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/views/jobs/search.gohtml">
+        <entry file="file://$PROJECT_DIR$/views/users/login-register.gohtml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="319">
-              <caret line="84" column="118" selection-start-line="84" selection-start-column="118" selection-end-line="84" selection-end-column="118" />
+            <state relative-caret-position="105">
+              <caret line="7" column="58" selection-start-line="7" selection-start-column="58" selection-end-line="7" selection-end-column="58" />
               <folding>
-                <element signature="n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" />
-                <element signature="n#div#1;n#div#0;n#div#0;n#div#0;n#!!top" />
-                <element signature="n#div#2;n#div#0;n#div#0;n#div#0;n#!!top" />
-                <element signature="n#div#3;n#div#0;n#div#0;n#div#0;n#!!top" />
+                <element signature="e#2377#4511#0#HTML" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/views/users/forgot_pw.gohtml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="90">
+              <caret line="6" column="63" selection-start-line="6" selection-start-column="63" selection-end-line="6" selection-end-column="63" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/controllers/users.go">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1500">
+              <caret line="111" column="5" selection-start-line="111" selection-start-column="5" selection-end-line="111" selection-end-column="5" />
             </state>
           </provider>
         </entry>
@@ -66,8 +80,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/assets/css/main.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="182">
-              <caret line="2046" column="32" selection-start-line="2046" selection-start-column="32" selection-end-line="2046" selection-end-column="32" />
+            <state relative-caret-position="77">
+              <caret line="2059" column="14" selection-start-line="2059" selection-start-column="14" selection-end-line="2059" selection-end-column="14" />
             </state>
           </provider>
         </entry>
@@ -109,9 +123,15 @@
       <find>f-cate</find>
       <find>/samueldaviddelacruz/lenslocked.com/</find>
       <find>.job-list-content h4</find>
+      <find>job-rag</find>
+      <find>post-job.html</find>
+      <find>my-account.html</find>
+      <find>lost your password?</find>
     </findStrings>
     <replaceStrings>
       <replace>/samueldaviddelacruz/go-job-board/</replace>
+      <replace>/</replace>
+      <replace>/login</replace>
     </replaceStrings>
     <dirStrings>
       <dir>$PROJECT_DIR$</dir>
@@ -133,11 +153,14 @@
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/views/jobs/list.gohtml" />
         <option value="$PROJECT_DIR$/middleware/require_user.go" />
-        <option value="$PROJECT_DIR$/views/layouts/navbar.gohtml" />
         <option value="$PROJECT_DIR$/main.go" />
         <option value="$PROJECT_DIR$/assets/css/main.css" />
         <option value="$PROJECT_DIR$/controllers/jobs.go" />
         <option value="$PROJECT_DIR$/views/jobs/search.gohtml" />
+        <option value="$PROJECT_DIR$/controllers/users.go" />
+        <option value="$PROJECT_DIR$/views/layouts/navbar.gohtml" />
+        <option value="$PROJECT_DIR$/views/users/forgot_pw.gohtml" />
+        <option value="$PROJECT_DIR$/views/users/login-register.gohtml" />
       </list>
     </option>
   </component>
@@ -167,35 +190,24 @@
             <path>
               <item name="go-job-board" type="b2602c69:ProjectViewProjectNode" />
               <item name="go-job-board" type="462c0819:PsiDirectoryNode" />
-              <item name="assets" type="462c0819:PsiDirectoryNode" />
-              <item name="css" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="go-job-board" type="b2602c69:ProjectViewProjectNode" />
-              <item name="go-job-board" type="462c0819:PsiDirectoryNode" />
               <item name="controllers" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="go-job-board" type="b2602c69:ProjectViewProjectNode" />
               <item name="go-job-board" type="462c0819:PsiDirectoryNode" />
-              <item name="middleware" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="go-job-board" type="b2602c69:ProjectViewProjectNode" />
-              <item name="go-job-board" type="462c0819:PsiDirectoryNode" />
               <item name="views" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="go-job-board" type="b2602c69:ProjectViewProjectNode" />
               <item name="go-job-board" type="462c0819:PsiDirectoryNode" />
               <item name="views" type="462c0819:PsiDirectoryNode" />
-              <item name="galleries" type="462c0819:PsiDirectoryNode" />
+              <item name="layouts" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="go-job-board" type="b2602c69:ProjectViewProjectNode" />
               <item name="go-job-board" type="462c0819:PsiDirectoryNode" />
               <item name="views" type="462c0819:PsiDirectoryNode" />
-              <item name="jobs" type="462c0819:PsiDirectoryNode" />
+              <item name="users" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -238,8 +250,8 @@
       <window_info anchor="bottom" id="Docker" show_stripe_button="false" />
       <window_info anchor="bottom" id="Database Changes" />
       <window_info anchor="bottom" id="Version Control" />
-      <window_info anchor="bottom" id="Terminal" sideWeight="0.49893278" visible="true" weight="0.32938644" />
-      <window_info anchor="bottom" id="Event Log" sideWeight="0.5010672" side_tool="true" visible="true" weight="0.32938644" />
+      <window_info anchor="bottom" id="Terminal" sideWeight="0.49839914" visible="true" weight="0.32938644" />
+      <window_info anchor="bottom" id="Event Log" sideWeight="0.50160086" side_tool="true" visible="true" weight="0.32938644" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" sideWeight="0.4994664" weight="0.32938644" />
       <window_info anchor="bottom" id="Run" order="2" />
@@ -356,13 +368,6 @@
     <entry file="file://$PROJECT_DIR$/views/data.go">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/views/layouts/navbar.gohtml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="26" column="98" selection-start-line="26" selection-start-column="98" selection-end-line="26" selection-end-column="98" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/middleware/require_user.go">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="645">
@@ -374,16 +379,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="453">
           <caret line="86" column="52" selection-start-line="86" selection-start-column="50" selection-end-line="86" selection-end-column="52" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main.go">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="543">
-          <caret line="93" column="22" selection-start-line="93" selection-start-column="22" selection-end-line="93" selection-end-column="22" />
-          <folding>
-            <element signature="e#14#414#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -403,8 +398,46 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/assets/css/main.css">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="182">
-          <caret line="2046" column="32" selection-start-line="2046" selection-start-column="32" selection-end-line="2046" selection-end-column="32" />
+        <state relative-caret-position="77">
+          <caret line="2059" column="14" selection-start-line="2059" selection-start-column="14" selection-end-line="2059" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/controllers/users.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1500">
+          <caret line="111" column="5" selection-start-line="111" selection-start-column="5" selection-end-line="111" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.go">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="303">
+          <caret line="71" column="55" selection-start-line="71" selection-start-column="4" selection-end-line="71" selection-end-column="55" />
+          <folding>
+            <element signature="e#14#414#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/views/layouts/navbar.gohtml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="139">
+          <caret line="20" column="28" selection-start-line="20" selection-start-column="28" selection-end-line="20" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/views/users/login.gohtml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/views/jobs/search.gohtml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-372">
+          <caret line="53" column="30" selection-start-line="53" selection-start-column="30" selection-end-line="53" selection-end-column="30" />
         </state>
       </provider>
     </entry>
@@ -415,15 +448,19 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/views/jobs/search.gohtml">
+    <entry file="file://$PROJECT_DIR$/views/users/forgot_pw.gohtml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="319">
-          <caret line="84" column="118" selection-start-line="84" selection-start-column="118" selection-end-line="84" selection-end-column="118" />
+        <state relative-caret-position="90">
+          <caret line="6" column="63" selection-start-line="6" selection-start-column="63" selection-end-line="6" selection-end-column="63" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/views/users/login-register.gohtml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="7" column="58" selection-start-line="7" selection-start-column="58" selection-end-line="7" selection-end-column="58" />
           <folding>
-            <element signature="n#div#0;n#div#0;n#div#0;n#div#0;n#!!top" />
-            <element signature="n#div#1;n#div#0;n#div#0;n#div#0;n#!!top" />
-            <element signature="n#div#2;n#div#0;n#div#0;n#div#0;n#!!top" />
-            <element signature="n#div#3;n#div#0;n#div#0;n#div#0;n#!!top" />
+            <element signature="e#2377#4511#0#HTML" />
           </folding>
         </state>
       </provider>

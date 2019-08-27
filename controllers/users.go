@@ -19,8 +19,8 @@ import (
 // initial setup
 func NewUsers(us models.UserService, emailer *email.Client) *Users {
 	return &Users{
-		LoginView:    views.NewView("bootstrap", "users/login"),
-		NewView:      views.NewView("bootstrap", "users/new"),
+		LoginView:    views.NewView("bootstrap", "users/login-register"),
+		//NewView:      views.NewView("bootstrap", "users/new"),
 		ForgotPwView: views.NewView("bootstrap", "users/forgot_pw"),
 		ResetPwView:  views.NewView("bootstrap", "users/reset_pw"),
 		us:           us,
