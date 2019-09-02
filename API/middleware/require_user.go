@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/samueldaviddelacruz/go-job-board/context"
-	"github.com/samueldaviddelacruz/go-job-board/models"
+	"github.com/samueldaviddelacruz/go-job-board/API/context"
+	"github.com/samueldaviddelacruz/go-job-board/API/models"
 )
 
 type Company struct {

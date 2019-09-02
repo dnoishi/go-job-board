@@ -2,8 +2,8 @@ package models
 
 import (
 	"github.com/jinzhu/gorm"
-	"github.com/samueldaviddelacruz/go-job-board/hash"
-	"github.com/samueldaviddelacruz/go-job-board/rand"
+	"github.com/samueldaviddelacruz/go-job-board/API/hash"
+	"github.com/samueldaviddelacruz/go-job-board/API/rand"
 )
 
 type pwReset struct {

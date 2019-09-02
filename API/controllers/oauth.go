@@ -8,10 +8,10 @@ import (
 
 	"github.com/gorilla/mux"
 
-	llctx "github.com/samueldaviddelacruz/go-job-board/context"
+	llctx "github.com/samueldaviddelacruz/go-job-board/API/context"
 
 	"github.com/gorilla/csrf"
-	"github.com/samueldaviddelacruz/go-job-board/models"
+	"github.com/samueldaviddelacruz/go-job-board/API/models"
 	"golang.org/x/oauth2"
 )
 

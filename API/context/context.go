@@ -3,7 +3,7 @@ package context
 import (
 	"context"
 
-	"github.com/samueldaviddelacruz/go-job-board/models"
+	"github.com/samueldaviddelacruz/go-job-board/API/models"
 )
 
 const (

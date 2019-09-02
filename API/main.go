@@ -7,12 +7,12 @@ import (
 
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
-	"github.com/samueldaviddelacruz/go-job-board/controllers"
-	"github.com/samueldaviddelacruz/go-job-board/email"
+	"github.com/samueldaviddelacruz/go-job-board/API/controllers"
+	"github.com/samueldaviddelacruz/go-job-board/API/email"
 
-	"github.com/samueldaviddelacruz/go-job-board/middleware"
-	"github.com/samueldaviddelacruz/go-job-board/models"
-	"github.com/samueldaviddelacruz/go-job-board/rand"
+	"github.com/samueldaviddelacruz/go-job-board/API/middleware"
+	"github.com/samueldaviddelacruz/go-job-board/API/models"
+	"github.com/samueldaviddelacruz/go-job-board/API/rand"
 )
 
 func main() {

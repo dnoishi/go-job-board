@@ -4,11 +4,11 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/samueldaviddelacruz/go-job-board/email"
+	"github.com/samueldaviddelacruz/go-job-board/API/email"
 
-	"github.com/samueldaviddelacruz/go-job-board/context"
-	"github.com/samueldaviddelacruz/go-job-board/models"
-	"github.com/samueldaviddelacruz/go-job-board/rand"
+	"github.com/samueldaviddelacruz/go-job-board/API/context"
+	"github.com/samueldaviddelacruz/go-job-board/API/models"
+	"github.com/samueldaviddelacruz/go-job-board/API/rand"
 )
 
 // NewCompany is used to create a new Company controller.
