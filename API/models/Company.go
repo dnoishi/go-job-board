@@ -16,9 +16,9 @@ import (
 // Company represents the Company model stored in the database
 type Company struct {
 	gorm.Model
-	Name         string `gorm:"not_null"`
-	Email        string `gorm:"not null;unique_index"`
-	Password     string `gorm:"-"`
+	Name         string `gorm:"not_null" json:"name"`
+	Email        string `gorm:"not null;unique_index" json:"email"`
+	Password     string `gorm:"-" json:"password"`
 	PasswordHash string `gorm:"not null"`
 	Remember     string `gorm:"-"`
 	RememberHash string `gorm:"not null;unique_index"`
