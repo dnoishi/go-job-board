@@ -6,7 +6,7 @@ import (
 	"net/url"
 	"time"
 
-	"gopkg.in/mailgun/mailgun-go.v3"
+	"github.com/mailgun/mailgun-go/v3"
 )
 
 const (
