@@ -1,4 +1,4 @@
-module github.com/samueldaviddelacruz/go-job-board
+module github.com/samueldaviddelacruz/go-job-board/API
 
 go 1.12
 

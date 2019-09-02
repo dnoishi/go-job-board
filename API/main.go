@@ -5,14 +5,12 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 	"github.com/samueldaviddelacruz/go-job-board/API/controllers"
 	"github.com/samueldaviddelacruz/go-job-board/API/email"
 
 	"github.com/samueldaviddelacruz/go-job-board/API/middleware"
 	"github.com/samueldaviddelacruz/go-job-board/API/models"
-	"github.com/samueldaviddelacruz/go-job-board/API/rand"
 )
 
 func main() {
@@ -35,7 +33,7 @@ func main() {
 	must(err)
 
 	defer services.Close()
-	//must(services.DestructiveReset())
+	must(services.DestructiveReset())
 	must(services.AutoMigrate())
 
 	mgCfg := appCfg.Mailgun
@@ -50,9 +48,9 @@ func main() {
 
 	companyC := controllers.NewCompany(services.Company, emailer)
 
-	randBytes, err := rand.Bytes(32)
+	//randBytes, err := rand.Bytes(32)
 	must(err)
-	csrfMw := csrf.Protect(randBytes, csrf.Secure(appCfg.IsProd()))
+	//csrfMw := csrf.Protect(randBytes, csrf.Secure(appCfg.IsProd()))
 
 	userMw := middleware.Company{
 		CompanyService: services.Company,
@@ -63,17 +61,17 @@ func main() {
 
 	r.HandleFunc("/jobs", jobsC.List).Methods("GET")
 
-	r.HandleFunc("/signup", companyC.Create).Methods("POST")
+	r.HandleFunc("/company/signup", companyC.Create).Methods("POST")
 
-	r.HandleFunc("/login", companyC.Login).Methods("POST")
-	r.HandleFunc("/logout", requireUserMw.ApplyFn(companyC.Logout)).Methods("POST")
+	r.HandleFunc("/company/login", companyC.Login).Methods("POST")
+	r.HandleFunc("/company/logout", requireUserMw.ApplyFn(companyC.Logout)).Methods("POST")
 
-	r.HandleFunc("/forgot", companyC.InitiateReset).Methods("POST")
+	r.HandleFunc("/company/forgot", companyC.InitiateReset).Methods("POST")
 
-	r.HandleFunc("/reset", companyC.CompleteReset).Methods("POST")
+	r.HandleFunc("/company/reset", companyC.CompleteReset).Methods("POST")
 
 	fmt.Printf("Running on port :%d", appCfg.Port)
-	must(http.ListenAndServe(fmt.Sprintf(":%d", appCfg.Port), csrfMw(userMw.Apply(r))))
+	must(http.ListenAndServe(fmt.Sprintf(":%d", appCfg.Port), userMw.Apply(r)))
 }
 
 func must(err error) {

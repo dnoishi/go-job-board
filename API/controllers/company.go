@@ -1,14 +1,12 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/samueldaviddelacruz/go-job-board/API/email"
 
-	"github.com/samueldaviddelacruz/go-job-board/API/context"
 	"github.com/samueldaviddelacruz/go-job-board/API/models"
-	"github.com/samueldaviddelacruz/go-job-board/API/rand"
 )
 
 // NewCompany is used to create a new Company controller.
@@ -40,33 +38,23 @@ type SignupForm struct {
 // POST /signup
 func (u *Company) Create(w http.ResponseWriter, r *http.Request) {
 
-	var form SignupForm
-
-	if err := parseForm(r, &form); err != nil {
+	company := models.Company{}
+	parseJSON(w, r, &company)
+	if err := u.us.Create(&company); err != nil {
 		//vd.SetAlert(err)
-		//u.NewView.Render(w, r, vd)
+		respondJSON(w, http.StatusInternalServerError, "Could not create resource")
 		return
 	}
-	user := models.Company{
-		Name:     form.Name,
-		Email:    form.Email,
-		Password: form.Password,
-	}
-
-	if err := u.us.Create(&user); err != nil {
-		//vd.SetAlert(err)
-		//u.NewView.Render(w, r, vd)
-		return
-	}
-
-	err := u.signIn(w, &user)
-	if err != nil {
-		http.Redirect(w, r, "/login", http.StatusFound)
-		return
-	}
-	u.emailer.Welcome(user.Name, user.Email)
-
+	/*
+		err := u.signIn(w, &user)
+		if err != nil {
+			http.Redirect(w, r, "/login", http.StatusFound)
+			return
+		}
+		u.emailer.Welcome(user.Name, user.Email)
+	*/
 	//views.RedirectAlert(w, r, "/galleries", http.StatusFound, alert)
+	respondJSON(w, http.StatusCreated, fmt.Sprintf("Created resource with ID: %d", company.ID))
 }
 
 type LogingForm struct {
@@ -80,30 +68,29 @@ type LogingForm struct {
 // POST /login
 func (u *Company) Login(w http.ResponseWriter, r *http.Request) {
 
-	form := LogingForm{}
-	if err := parseForm(r, &form); err != nil {
+	company := models.Company{}
+	parseJSON(w, r, &company)
 
-		return
-	}
-
-	user, err := u.us.Authenticate(form.Email, form.Password)
+	_, err := u.us.Authenticate(company.Email, company.Password)
 	if err != nil {
 		switch err {
 		case models.ErrNotFound:
-			//vd.AlertError("Invalid email address")
+			respondJSON(w, http.StatusUnauthorized, "Invalid email address")
 		default:
 			//vd.SetAlert(err)
+			respondJSON(w, http.StatusInternalServerError, err)
 		}
 		//u.LoginView.Render(w, r, vd)
 		return
 	}
-	err = u.signIn(w, user)
-	if err != nil {
 
+	err = u.signIn(w, &company)
+	if err != nil {
 		//u.LoginView.Render(w, r, vd)
+		respondJSON(w, http.StatusInternalServerError, err)
 		return
 	}
-	http.Redirect(w, r, "/galleries", http.StatusFound)
+	respondJSON(w, http.StatusOK, "Success")
 }
 
 // Logout is used to delete a users session cookie (remember_token)
@@ -111,19 +98,21 @@ func (u *Company) Login(w http.ResponseWriter, r *http.Request) {
 // token.
 // POST /logout
 func (u *Company) Logout(w http.ResponseWriter, r *http.Request) {
-	cookie := http.Cookie{
-		Name:     "remember_token",
-		Value:    "",
-		Expires:  time.Now(),
-		HttpOnly: true,
-	}
-	http.SetCookie(w, &cookie)
+	/*
+		cookie := http.Cookie{
+			Name:     "remember_token",
+			Value:    "",
+			Expires:  time.Now(),
+			HttpOnly: true,
+		}
+		http.SetCookie(w, &cookie)
 
-	user := context.User(r.Context())
-	token, _ := rand.RememberToken()
-	user.Remember = token
-	u.us.Update(user)
-	http.Redirect(w, r, "/", http.StatusFound)
+		user := context.User(r.Context())
+		//token, _ := rand.RememberToken()
+
+		u.us.Update(user)
+		http.Redirect(w, r, "/", http.StatusFound)
+	*/
 }
 
 // ResetPwForm is used to process the forgot password form
@@ -200,25 +189,26 @@ func (u *Company) CompleteReset(w http.ResponseWriter, r *http.Request) {
 
 // signIn is used to sign the given user via cookies.
 func (u *Company) signIn(w http.ResponseWriter, user *models.Company) error {
-	if user.Remember == "" {
-		token, err := rand.RememberToken()
-		if err != nil {
-			return err
+	/*
+		if user.Remember == "" {
+			token, err := rand.RememberToken()
+			if err != nil {
+				return err
+			}
+			user.Remember = token
+
+			err = u.us.Update(user)
+			if err != nil {
+				return err
+			}
 		}
-		user.Remember = token
 
-		err = u.us.Update(user)
-		if err != nil {
-			return err
+		cookie := http.Cookie{
+			Name:     "remember_token",
+			Value:    user.Remember,
+			HttpOnly: true,
 		}
-	}
-
-	cookie := http.Cookie{
-		Name:     "remember_token",
-		Value:    user.Remember,
-		HttpOnly: true,
-	}
-	http.SetCookie(w, &cookie)
-
+		http.SetCookie(w, &cookie)
+	*/
 	return nil
 }

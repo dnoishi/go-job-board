@@ -8,7 +8,6 @@ import (
 	"github.com/jinzhu/gorm"
 
 	"github.com/samueldaviddelacruz/go-job-board/API/hash"
-	"github.com/samueldaviddelacruz/go-job-board/API/rand"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -20,8 +19,6 @@ type Company struct {
 	Email        string `gorm:"not null;unique_index" json:"email"`
 	Password     string `gorm:"-" json:"password"`
 	PasswordHash string `gorm:"not null"`
-	Remember     string `gorm:"-"`
-	RememberHash string `gorm:"not null;unique_index"`
 }
 
 // CompanyDB is used to interact with the users database.
@@ -203,18 +200,6 @@ func (uv *userValidator) ByEmail(email string) (*Company, error) {
 	return uv.CompanyDB.ByEmail(user.Email)
 }
 
-// ByRemember will hash the remember token and then call
-// ByRemember on the subsequent CompanyDB Layer.
-func (uv *userValidator) ByRemember(token string) (*Company, error) {
-	user := Company{
-		Remember: token,
-	}
-	if err := runCompanyValFuncs(&user, uv.hmacRemember); err != nil {
-		return nil, err
-	}
-	return uv.CompanyDB.ByRemember(user.RememberHash)
-}
-
 // Create will create the provided user and backfill data
 // like the ID, CreatedAt, and UpdatedAt fields.
 func (uv *userValidator) Create(user *Company) error {
@@ -224,10 +209,7 @@ func (uv *userValidator) Create(user *Company) error {
 		uv.passwordMinLength,
 		uv.bcryptPassword,
 		uv.passwordHashRequired,
-		uv.setRememberIfUnset,
-		uv.rememberMinBytes,
-		uv.hmacRemember,
-		uv.rememberHashRequired,
+
 		uv.normalizeEmail,
 		uv.requireEmail,
 		uv.emailFormat,
@@ -245,9 +227,7 @@ func (uv *userValidator) Update(user *Company) error {
 		uv.passwordMinLength,
 		uv.bcryptPassword,
 		uv.passwordHashRequired,
-		uv.rememberMinBytes,
-		uv.hmacRemember,
-		uv.rememberHashRequired,
+
 		uv.normalizeEmail,
 		uv.requireEmail,
 		uv.emailFormat,
@@ -282,52 +262,6 @@ func (uv *userValidator) bcryptPassword(user *Company) error {
 	}
 	user.PasswordHash = string(hashedBytes)
 	user.Password = ""
-
-	return nil
-}
-
-func (uv *userValidator) hmacRemember(user *Company) error {
-	if user.Remember == "" {
-		return nil
-	}
-
-	user.RememberHash = uv.hmac.Hash(user.Remember)
-
-	return nil
-}
-
-func (uv *userValidator) setRememberIfUnset(user *Company) error {
-	if user.Remember != "" {
-		return nil
-	}
-	token, err := rand.RememberToken()
-	if err != nil {
-		return err
-	}
-	user.Remember = token
-	return nil
-}
-
-func (uv *userValidator) rememberMinBytes(user *Company) error {
-	if user.Remember == "" {
-		return nil
-	}
-
-	n, err := rand.NBytes(user.Remember)
-	if err != nil {
-		return err
-	}
-
-	if n < 32 {
-		return ErrRememberTooShort
-	}
-	return nil
-}
-
-func (uv *userValidator) rememberHashRequired(user *Company) error {
-	if user.RememberHash == "" {
-		return ErrRememberRequired
-	}
 
 	return nil
 }

@@ -41,3 +41,14 @@ func respondJSON(w http.ResponseWriter, status int, payload interface{}) {
 	w.WriteHeader(status)
 	w.Write([]byte(response))
 }
+
+func parseJSON(w http.ResponseWriter, r *http.Request, payload interface{}) {
+
+	err := json.NewDecoder(r.Body).Decode(&payload)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Server Error"))
+		return
+	}
+
+}
