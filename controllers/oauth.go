@@ -9,7 +9,6 @@ import (
 	"github.com/gorilla/mux"
 
 	llctx "github.com/samueldaviddelacruz/go-job-board/context"
-	"github.com/samueldaviddelacruz/go-job-board/dbx"
 
 	"github.com/gorilla/csrf"
 	"github.com/samueldaviddelacruz/go-job-board/models"
@@ -99,26 +98,4 @@ func (o *Oauths) Callback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Fprintf(w, "%+v", token)
-}
-
-func (o *Oauths) DropboxTest(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	service := vars["service"]
-
-	r.ParseForm()
-	path := r.FormValue("path")
-
-	user := llctx.User(r.Context())
-	userOath, err := o.os.Find(user.ID, service)
-	if err != nil {
-		panic(err)
-	}
-	token := userOath.Token
-	folders, files, err := dbx.List(token.AccessToken, path)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Fprintln(w, "Folders=", folders)
-	fmt.Fprintln(w, "Files=", files)
-
 }

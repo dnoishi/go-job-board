@@ -13,13 +13,10 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// User represents the user model stored in our database
-// This is used for user accounts, storing both email
-// address and a password so users can log in and gain
-// access to their content.
-type User struct {
+// Company represents the Company model stored in the database
+type Company struct {
 	gorm.Model
-	Name         string
+	Name         string `gorm:"not_null"`
 	Email        string `gorm:"not null;unique_index"`
 	Password     string `gorm:"-"`
 	PasswordHash string `gorm:"not null"`
@@ -27,7 +24,7 @@ type User struct {
 	RememberHash string `gorm:"not null;unique_index"`
 }
 
-// UserDB is used to interact with the users database.
+// CompanyDB is used to interact with the users database.
 //
 // For pretty much all single user queries:
 // If the user is found, we will return a nil error
@@ -38,53 +35,53 @@ type User struct {
 //
 // For single user queries, any error but ErrNotFound should
 // probably result in a 500 error.
-type UserDB interface {
+type CompanyDB interface {
 	// Methods for querying single users
-	ByID(id uint) (*User, error)
-	ByEmail(email string) (*User, error)
-	ByRemember(token string) (*User, error)
+	ByID(id uint) (*Company, error)
+	ByEmail(email string) (*Company, error)
+	ByRemember(token string) (*Company, error)
 
 	// Methods for altering users
-	Create(user *User) error
-	Update(user *User) error
+	Create(user *Company) error
+	Update(user *Company) error
 	Delete(id uint) error
 }
 
-// UserService is a set of methods used to manipulate and work
+// CompanyService is a set of methods used to manipulate and work
 // with the user model
-type UserService interface {
+type CompanyService interface {
 	// Authenticate will verify if the provided email address and
 	// password are correct. if they are correct, the user
 	// corresponding to that e  mail will be returned. Otherwise
 	// you will receive either:
 	// ErrNotFound, ErrPasswordIncorrect, or another error if
 	// something goes wrong.
-	Authenticate(email, password string) (*User, error)
+	Authenticate(email, password string) (*Company, error)
 
 	// InitiateReset will start the reset password process
 	// by creating a reset token for the user found with the
 	// provided email address.
 	InitiateReset(email string) (string, error)
-	CompleteReset(token, newPw string) (*User, error)
-	UserDB
+	CompleteReset(token, newPw string) (*Company, error)
+	CompanyDB
 }
 
-func NewUserService(db *gorm.DB, pepper, hmacKey string) UserService {
+func NewCompanyService(db *gorm.DB, pepper, hmacKey string) CompanyService {
 	ug := &userGorm{db}
 
 	hmac := hash.NewHMAC(hmacKey)
-	uv := newUserValidator(ug, hmac, pepper)
-	return &userService{
-		UserDB:    uv,
+	uv := newCompanyValidator(ug, hmac, pepper)
+	return &companyService{
+		CompanyDB: uv,
 		pepper:    pepper,
 		pwResetDB: newPwResetValidator(&pwResetGorm{db}, hmac),
 	}
 }
 
-var _ UserService = &userService{}
+var _ CompanyService = &companyService{}
 
-type userService struct {
-	UserDB
+type companyService struct {
+	CompanyDB
 	pepper    string
 	pwResetDB pwResetDB
 }
@@ -99,12 +96,12 @@ type userService struct {
 // user,nil
 // Otherwise if another error is encountered this will return
 // nil,error
-func (us *userService) Authenticate(email, password string) (*User, error) {
-	foundUser, err := us.ByEmail(email)
+func (cs *companyService) Authenticate(email, password string) (*Company, error) {
+	foundCompany, err := cs.ByEmail(email)
 	if err != nil {
 		return nil, err
 	}
-	err = bcrypt.CompareHashAndPassword([]byte(foundUser.PasswordHash), []byte(password+us.pepper))
+	err = bcrypt.CompareHashAndPassword([]byte(foundCompany.PasswordHash), []byte(password+cs.pepper))
 	if err != nil {
 		switch err {
 		case bcrypt.ErrMismatchedHashAndPassword:
@@ -114,11 +111,11 @@ func (us *userService) Authenticate(email, password string) (*User, error) {
 		}
 	}
 
-	return foundUser, nil
+	return foundCompany, nil
 }
 
-func (us *userService) InitiateReset(email string) (string, error) {
-	user, err := us.ByEmail(email)
+func (cs *companyService) InitiateReset(email string) (string, error) {
+	user, err := cs.ByEmail(email)
 	if err != nil {
 		return "", err
 	}
@@ -126,13 +123,13 @@ func (us *userService) InitiateReset(email string) (string, error) {
 	pwr := pwReset{
 		UserID: user.ID,
 	}
-	if err := us.pwResetDB.Create(&pwr); err != nil {
+	if err := cs.pwResetDB.Create(&pwr); err != nil {
 		return "", err
 	}
 	return pwr.Token, nil
 }
-func (us *userService) CompleteReset(token, newPw string) (*User, error) {
-	pwr, err := us.pwResetDB.ByToken(token)
+func (cs *companyService) CompleteReset(token, newPw string) (*Company, error) {
+	pwr, err := cs.pwResetDB.ByToken(token)
 	if err != nil {
 		if err == ErrNotFound {
 			return nil, ErrPwResetInvalid
@@ -145,25 +142,25 @@ func (us *userService) CompleteReset(token, newPw string) (*User, error) {
 		return nil, ErrPwResetInvalid
 	}
 
-	user, err := us.ByID(pwr.UserID)
+	user, err := cs.ByID(pwr.UserID)
 
 	if err != nil {
 		return nil, err
 	}
 	user.Password = newPw
-	err = us.Update(user)
+	err = cs.Update(user)
 	if err != nil {
 		return nil, err
 	}
 
-	us.pwResetDB.Delete(pwr.ID)
+	cs.pwResetDB.Delete(pwr.ID)
 
 	return user, nil
 }
 
-type userValFunc func(*User) error
+type userValFunc func(*Company) error
 
-func runUserValFuncs(user *User, fns ...userValFunc) error {
+func runCompanyValFuncs(user *Company, fns ...userValFunc) error {
 	for _, fn := range fns {
 		if err := fn(user); err != nil {
 			return err
@@ -173,11 +170,11 @@ func runUserValFuncs(user *User, fns ...userValFunc) error {
 	return nil
 }
 
-var _ UserDB = &userValidator{}
+var _ CompanyDB = &userValidator{}
 
-func newUserValidator(udb UserDB, hmac hash.HMAC, pepper string) *userValidator {
+func newCompanyValidator(udb CompanyDB, hmac hash.HMAC, pepper string) *userValidator {
 	return &userValidator{
-		UserDB:     udb,
+		CompanyDB:  udb,
 		hmac:       hmac,
 		emailRegex: regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,16}$`),
 		pepper:     pepper,
@@ -185,7 +182,7 @@ func newUserValidator(udb UserDB, hmac hash.HMAC, pepper string) *userValidator 
 }
 
 type userValidator struct {
-	UserDB
+	CompanyDB
 	hmac hash.HMAC
 	// emailRegex is used to match email addresses. Its not
 	// perfect but works well enough for now :).
@@ -194,34 +191,34 @@ type userValidator struct {
 }
 
 // ByEmail will normalize the email address before calling
-// ByEmail on the UserDB field.
-func (uv *userValidator) ByEmail(email string) (*User, error) {
-	user := User{
+// ByEmail on the CompanyDB field.
+func (uv *userValidator) ByEmail(email string) (*Company, error) {
+	user := Company{
 		Email: email,
 	}
-	if err := runUserValFuncs(&user, uv.normalizeEmail); err != nil {
+	if err := runCompanyValFuncs(&user, uv.normalizeEmail); err != nil {
 		return nil, err
 	}
 
-	return uv.UserDB.ByEmail(user.Email)
+	return uv.CompanyDB.ByEmail(user.Email)
 }
 
 // ByRemember will hash the remember token and then call
-// ByRemember on the subsequent UserDB Layer.
-func (uv *userValidator) ByRemember(token string) (*User, error) {
-	user := User{
+// ByRemember on the subsequent CompanyDB Layer.
+func (uv *userValidator) ByRemember(token string) (*Company, error) {
+	user := Company{
 		Remember: token,
 	}
-	if err := runUserValFuncs(&user, uv.hmacRemember); err != nil {
+	if err := runCompanyValFuncs(&user, uv.hmacRemember); err != nil {
 		return nil, err
 	}
-	return uv.UserDB.ByRemember(user.RememberHash)
+	return uv.CompanyDB.ByRemember(user.RememberHash)
 }
 
 // Create will create the provided user and backfill data
 // like the ID, CreatedAt, and UpdatedAt fields.
-func (uv *userValidator) Create(user *User) error {
-	err := runUserValFuncs(
+func (uv *userValidator) Create(user *Company) error {
+	err := runCompanyValFuncs(
 		user,
 		uv.passwordRequired,
 		uv.passwordMinLength,
@@ -239,12 +236,12 @@ func (uv *userValidator) Create(user *User) error {
 		return err
 	}
 
-	return uv.UserDB.Create(user)
+	return uv.CompanyDB.Create(user)
 }
 
 // Update will hash a remember token if it is provided.
-func (uv *userValidator) Update(user *User) error {
-	err := runUserValFuncs(user,
+func (uv *userValidator) Update(user *Company) error {
+	err := runCompanyValFuncs(user,
 		uv.passwordMinLength,
 		uv.bcryptPassword,
 		uv.passwordHashRequired,
@@ -258,23 +255,23 @@ func (uv *userValidator) Update(user *User) error {
 	if err != nil {
 		return err
 	}
-	return uv.UserDB.Update(user)
+	return uv.CompanyDB.Update(user)
 }
 
 // Delete will delete the user with the provided ID
 func (uv *userValidator) Delete(id uint) error {
-	var user User
+	var user Company
 	user.ID = id
-	if err := runUserValFuncs(&user, uv.idGreaterThan(0)); err != nil {
+	if err := runCompanyValFuncs(&user, uv.idGreaterThan(0)); err != nil {
 		return err
 	}
-	return uv.UserDB.Delete(id)
+	return uv.CompanyDB.Delete(id)
 }
 
 // bcryptPassword will hash a user's password with a
 // predefined pepper (userPwPepper) and bcrypt if the
 // Password field is not an empty string
-func (uv *userValidator) bcryptPassword(user *User) error {
+func (uv *userValidator) bcryptPassword(user *Company) error {
 	if user.Password == "" {
 		return nil
 	}
@@ -289,7 +286,7 @@ func (uv *userValidator) bcryptPassword(user *User) error {
 	return nil
 }
 
-func (uv *userValidator) hmacRemember(user *User) error {
+func (uv *userValidator) hmacRemember(user *Company) error {
 	if user.Remember == "" {
 		return nil
 	}
@@ -299,7 +296,7 @@ func (uv *userValidator) hmacRemember(user *User) error {
 	return nil
 }
 
-func (uv *userValidator) setRememberIfUnset(user *User) error {
+func (uv *userValidator) setRememberIfUnset(user *Company) error {
 	if user.Remember != "" {
 		return nil
 	}
@@ -311,7 +308,7 @@ func (uv *userValidator) setRememberIfUnset(user *User) error {
 	return nil
 }
 
-func (uv *userValidator) rememberMinBytes(user *User) error {
+func (uv *userValidator) rememberMinBytes(user *Company) error {
 	if user.Remember == "" {
 		return nil
 	}
@@ -327,7 +324,7 @@ func (uv *userValidator) rememberMinBytes(user *User) error {
 	return nil
 }
 
-func (uv *userValidator) rememberHashRequired(user *User) error {
+func (uv *userValidator) rememberHashRequired(user *Company) error {
 	if user.RememberHash == "" {
 		return ErrRememberRequired
 	}
@@ -336,7 +333,7 @@ func (uv *userValidator) rememberHashRequired(user *User) error {
 }
 
 func (uv *userValidator) idGreaterThan(value uint) userValFunc {
-	return func(user *User) error {
+	return func(user *Company) error {
 		if user.ID <= value {
 			return ErrIDInvalid
 		}
@@ -344,27 +341,27 @@ func (uv *userValidator) idGreaterThan(value uint) userValFunc {
 	}
 }
 
-func (uv *userValidator) normalizeEmail(user *User) error {
+func (uv *userValidator) normalizeEmail(user *Company) error {
 	user.Email = strings.ToLower(user.Email)
 	user.Email = strings.TrimSpace(user.Email)
 	return nil
 }
 
-func (uv *userValidator) requireEmail(user *User) error {
+func (uv *userValidator) requireEmail(user *Company) error {
 	if user.Email == "" {
 		return ErrEmailRequired
 	}
 	return nil
 }
 
-func (uv *userValidator) emailFormat(user *User) error {
+func (uv *userValidator) emailFormat(user *Company) error {
 	if !uv.emailRegex.MatchString(user.Email) {
 		return ErrEmailInvalid
 	}
 	return nil
 }
 
-func (uv *userValidator) emailIsAvail(user *User) error {
+func (uv *userValidator) emailIsAvail(user *Company) error {
 	existing, err := uv.ByEmail(user.Email)
 	if err == ErrNotFound {
 		// Email address is not taken
@@ -383,7 +380,7 @@ func (uv *userValidator) emailIsAvail(user *User) error {
 	return nil
 }
 
-func (uv *userValidator) passwordMinLength(user *User) error {
+func (uv *userValidator) passwordMinLength(user *Company) error {
 	if user.Password == "" {
 		return nil
 	}
@@ -394,7 +391,7 @@ func (uv *userValidator) passwordMinLength(user *User) error {
 	return nil
 }
 
-func (uv *userValidator) passwordRequired(user *User) error {
+func (uv *userValidator) passwordRequired(user *Company) error {
 	if user.Password == "" {
 		return ErrPasswordRequired
 	}
@@ -402,7 +399,7 @@ func (uv *userValidator) passwordRequired(user *User) error {
 	return nil
 }
 
-func (uv *userValidator) passwordHashRequired(user *User) error {
+func (uv *userValidator) passwordHashRequired(user *Company) error {
 	if user.PasswordHash == "" {
 		return ErrPasswordRequired
 	}
@@ -410,7 +407,7 @@ func (uv *userValidator) passwordHashRequired(user *User) error {
 	return nil
 }
 
-var _ UserDB = &userGorm{}
+var _ CompanyDB = &userGorm{}
 
 type userGorm struct {
 	db *gorm.DB
@@ -425,8 +422,8 @@ type userGorm struct {
 //
 // As a general rule, any error but ErrNotFound should
 // probably result in a 500 error.
-func (ug *userGorm) ByID(id uint) (*User, error) {
-	var user User
+func (ug *userGorm) ByID(id uint) (*Company, error) {
+	var user Company
 	db := ug.db.Where("id = ?", id)
 	err := first(db, &user)
 
@@ -444,8 +441,8 @@ func (ug *userGorm) ByID(id uint) (*User, error) {
 //
 // As a general rule, any error but ErrNotFound should
 // probably result in a 500 error.
-func (ug *userGorm) ByEmail(email string) (*User, error) {
-	var user User
+func (ug *userGorm) ByEmail(email string) (*Company, error) {
+	var user Company
 	db := ug.db.Where("email = ?", email)
 	err := first(db, &user)
 
@@ -456,8 +453,8 @@ func (ug *userGorm) ByEmail(email string) (*User, error) {
 // and returns that user, This method expects the remember
 // token to already be hashed.
 // Errors are the same as ByEmail
-func (ug *userGorm) ByRemember(rememberHash string) (*User, error) {
-	var user User
+func (ug *userGorm) ByRemember(rememberHash string) (*Company, error) {
+	var user Company
 
 	db := ug.db.Where("remember_hash = ?", rememberHash)
 	err := first(db, &user)
@@ -467,19 +464,19 @@ func (ug *userGorm) ByRemember(rememberHash string) (*User, error) {
 
 // Create will create the provided user and backfill data
 // like the ID, CreatedAt, and UpdatedAt fields.
-func (ug *userGorm) Create(user *User) error {
+func (ug *userGorm) Create(user *Company) error {
 	return ug.db.Create(user).Error
 }
 
 // Update will update the provided user with all of the data
 // in the provided the user object.
-func (ug *userGorm) Update(user *User) error {
+func (ug *userGorm) Update(user *Company) error {
 	return ug.db.Save(user).Error
 }
 
 // Delete will delete the user with the provided ID
 func (ug *userGorm) Delete(id uint) error {
-	user := User{Model: gorm.Model{ID: id}}
+	user := Company{Model: gorm.Model{ID: id}}
 	return ug.db.Delete(&user).Error
 }
 

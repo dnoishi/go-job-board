@@ -1,21 +1,22 @@
 package middleware
 
 import (
-	"github.com/samueldaviddelacruz/go-job-board/context"
-	"github.com/samueldaviddelacruz/go-job-board/models"
 	"net/http"
 	"strings"
+
+	"github.com/samueldaviddelacruz/go-job-board/context"
+	"github.com/samueldaviddelacruz/go-job-board/models"
 )
 
-type User struct {
-	models.UserService
+type Company struct {
+	models.CompanyService
 }
 
-func (mw *User) Apply(next http.Handler) http.HandlerFunc {
+func (mw *Company) Apply(next http.Handler) http.HandlerFunc {
 	return mw.ApplyFn(next.ServeHTTP)
 }
 
-func (mw *User) ApplyFn(next http.HandlerFunc) http.HandlerFunc {
+func (mw *Company) ApplyFn(next http.HandlerFunc) http.HandlerFunc {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		path := r.URL.Path
@@ -34,7 +35,7 @@ func (mw *User) ApplyFn(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		user, err := mw.UserService.ByRemember(cookie.Value)
+		user, err := mw.CompanyService.ByRemember(cookie.Value)
 		if err != nil {
 			next(w, r)
 			return
@@ -51,7 +52,7 @@ func (mw *User) ApplyFn(next http.HandlerFunc) http.HandlerFunc {
 // RequireUser assumes that User middleware has already been run
 // otherwise it will not work correctly.
 type RequireUser struct {
-	User
+	Company
 }
 
 // Apply assumes that User middleware has already been run

@@ -19,26 +19,19 @@ func WithGorm(dialect, connectionInfo string) ServicesConfig {
 	}
 }
 
-func WithUser(pepper, hmacKey string) ServicesConfig {
+func WithCompany(pepper, hmacKey string) ServicesConfig {
 
 	return func(s *Services) error {
 
-		s.User = NewUserService(s.db, pepper, hmacKey)
+		s.Company = NewCompanyService(s.db, pepper, hmacKey)
 		return nil
 	}
 }
 
-func WithGallery() ServicesConfig {
+func WithJobPost() ServicesConfig {
 
 	return func(s *Services) error {
-		s.Gallery = NewGalleryService(s.db)
-		return nil
-	}
-}
-
-func WithImage() ServicesConfig {
-	return func(s *Services) error {
-		s.Image = NewImageService()
+		s.JobPost = NewJobPostService(s.db)
 		return nil
 	}
 }
@@ -70,9 +63,8 @@ func NewServices(cfgs ...ServicesConfig) (*Services, error) {
 }
 
 type Services struct {
-	Gallery GalleryService
-	Image   ImageService
-	User    UserService
+	JobPost JobPostService
+	Company CompanyService
 	OAuth   OAuthService
 	db      *gorm.DB
 }
@@ -85,12 +77,12 @@ func (s *Services) Close() error {
 // AutoMigrate will attempt to automatically migrate the
 // all tables
 func (s *Services) AutoMigrate() error {
-	return s.db.AutoMigrate(&User{}, &Gallery{}, &pwReset{}, &OAuth{}).Error
+	return s.db.AutoMigrate(&Company{}, &JobPost{}, &pwReset{}, &OAuth{}).Error
 }
 
 // DestructiveReset drops the all tables and rebuilds them
 func (s *Services) DestructiveReset() error {
-	err := s.db.DropTableIfExists(&User{}, &Gallery{}, &pwReset{}, &OAuth{}).Error
+	err := s.db.DropTableIfExists(&Company{}, &JobPost{}, &pwReset{}, &OAuth{}).Error
 	if err != nil {
 		return err
 	}
