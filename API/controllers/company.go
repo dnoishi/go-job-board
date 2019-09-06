@@ -24,6 +24,10 @@ type Company struct {
 	us      models.UserService
 	emailer *email.Client
 }
+type Credentials struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
 
 // Create is used to process the signup form when a user
 // submits it. This is used to create a new user account.
@@ -31,12 +35,16 @@ type Company struct {
 // POST /signup
 func (u *Company) Create(w http.ResponseWriter, r *http.Request) {
 
+	credentials := Credentials{
+	}
+	//company.
+	parseJSON(w, r, &credentials)
 	companyUser := models.User{
-		RoleID: 1,
+		RoleID:   1,
+		Password: credentials.Password,
+		Email:    credentials.Email,
 	}
 
-	//company.
-	parseJSON(w, r, &companyUser)
 	if err := u.us.Create(&companyUser); err != nil {
 		//vd.SetAlert(err)
 		respondJSON(w, http.StatusInternalServerError, err.Error())
@@ -61,11 +69,15 @@ func (u *Company) Create(w http.ResponseWriter, r *http.Request) {
 //
 // POST /login
 func (u *Company) Login(w http.ResponseWriter, r *http.Request) {
+	credentials := Credentials{
+	}
 
-	company := models.User{}
-	parseJSON(w, r, &company)
-
-	_, err := u.us.Authenticate(company.Email, company.Password)
+	parseJSON(w, r, &credentials)
+	companyUser := models.User{
+		Password: credentials.Password,
+		Email:    credentials.Email,
+	}
+	_, err := u.us.Authenticate(companyUser.Email, companyUser.Password)
 	if err != nil {
 		switch err {
 		case models.ErrNotFound:
@@ -78,7 +90,7 @@ func (u *Company) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = u.signIn(w, &company)
+	err = u.signIn(w, &companyUser)
 	if err != nil {
 		//u.LoginView.Render(w, r, vd)
 		respondJSON(w, http.StatusInternalServerError, err)

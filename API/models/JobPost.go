@@ -4,6 +4,10 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+type Category struct {
+	gorm.Model
+	CategoryName string
+}
 type Location struct {
 	gorm.Model
 	LocationName string
@@ -12,13 +16,15 @@ type Location struct {
 // JobPost represents a job post
 type JobPost struct {
 	gorm.Model
-	UserID      uint     `gorm:"not_null;index" json:"userId"`
-	Title       string   `gorm:"not_null" json:"title"`
-	Location    Location `json:"location"`
-	LocationID  uint //`gorm:"not_null"`
-	Category    string `gorm:"not_null" json:"category"`
-	Description string `gorm:"not_null" json:"description"`
-	ApplyAt     string `gorm:"not_null" json:"applyAt"`
+	UserID uint `gorm:"not_null" json:"userId"`
+
+	Title       string    `gorm:"not_null" json:"title"`
+	Location    *Location `json:"location,omitempty"`
+	LocationID  uint      `gorm:"not_null" json:"locationId"`
+	Category    *Category `json:"category,omitempty"`
+	CategoryID  uint      `gorm:"not_null" json:"categoryId"`
+	Description string    `gorm:"not_null" json:"description"`
+	ApplyAt     string    `gorm:"not_null" json:"applyAt"`
 }
 
 type JobPostService interface {
@@ -103,7 +109,7 @@ type jobPostGorm struct {
 
 func (jpg *jobPostGorm) FindAll() ([]JobPost, error) {
 	var jobPosts []JobPost
-	err := jpg.db.Find(&jobPosts).Error
+	err := jpg.db.Set("gorm:auto_preload", true).Find(&jobPosts).Error
 	if err != nil {
 		return nil, err
 	}

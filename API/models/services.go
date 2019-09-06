@@ -77,11 +77,18 @@ func (s *Services) Close() error {
 // AutoMigrate will attempt to automatically migrate
 // all tables
 func (s *Services) AutoMigrate() error {
-	err := s.db.AutoMigrate(&User{}, &Role{}, &Location{}, &JobPost{}, &pwReset{}, &OAuth{}).Error
+	err := s.db.AutoMigrate(
+		&User{},
+		&Role{},
+		&Location{},
+		&Category{},
+		&JobPost{},
+		&pwReset{},
+		&OAuth{}).Error
 	if err != nil {
 		return err
 	}
-	return runPopulatingFuncs(s.seedRoles, s.seedLocations)
+	return runPopulatingFuncs(s.seedRoles, s.seedLocations, s.seedCategories)
 }
 func (s *Services) seedRoles() error {
 	return s.db.Model(&Role{}).Create(&Role{RoleName: "Company"}).Create(&Role{RoleName: "Candidate"}).Error
@@ -95,12 +102,22 @@ func (s *Services) seedLocations() error {
 		Create(&Location{LocationName: "Remote"}).Error
 }
 
+func (s *Services) seedCategories() error {
+	return s.db.Model(&Category{}).
+		Create(&Category{CategoryName: "Web Development"}).
+		Create(&Category{CategoryName: "Mobile Development"}).
+		Create(&Category{CategoryName: "QA"}).
+		Create(&Category{CategoryName: "DBA"}).
+		Create(&Category{CategoryName: "DevOps"}).Error
+}
+
 // DestructiveReset drops the all tables and rebuilds them
 func (s *Services) DestructiveReset() error {
 	err := s.db.DropTableIfExists(
 		&User{},
 		&Role{},
 		&JobPost{},
+		&Category{},
 		&Location{},
 		&pwReset{},
 		&OAuth{}).Error

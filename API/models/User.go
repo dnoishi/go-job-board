@@ -18,13 +18,12 @@ type Role struct {
 // User represents the User model stored in the database
 type User struct {
 	gorm.Model
-	Name         string `gorm:"not_null" json:"name"`
-	Email        string `gorm:"not null;unique_index" json:"email"`
-	Password     string `gorm:"-" json:"password"`
-	PasswordHash string `gorm:"not null"`
-	Role         Role   `json:"role"`
-	RoleID       uint
-	JobPosts     []JobPost `json:"jobPosts"`
+	Email        string    `gorm:"not null;unique_index" json:"email"`
+	PasswordHash string    `gorm:"not null" json:"-"`
+	Password     string    `json:"-"`
+	Role         *Role     `json:"-"`
+	RoleID       uint      `json:"roleId,omitempty"`
+	JobPosts     []JobPost `json:"jobPosts,omitempty"`
 }
 
 // UserDB is used to interact with the users database.
@@ -386,7 +385,7 @@ func (ug *userGorm) ByID(id uint) (*User, error) {
 func (ug *userGorm) ByEmail(email string) (*User, error) {
 	var user User
 	db := ug.db.Where("email = ?", email)
-	err := first(db.Set("gorm:auto_preload", true), &user)
+	err := first(db, &user)
 
 	return &user, err
 }

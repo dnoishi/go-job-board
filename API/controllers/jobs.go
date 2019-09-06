@@ -34,6 +34,7 @@ func (j *Jobs) Create(w http.ResponseWriter, r *http.Request) {
 	jobPost := models.JobPost{
 		UserID:     1,
 		LocationID: 1,
+		CategoryID: 1,
 	}
 	parseJSON(w, r, &jobPost)
 
