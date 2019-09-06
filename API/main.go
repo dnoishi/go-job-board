@@ -26,7 +26,7 @@ func main() {
 			postgresConfig.Dialect(),
 			postgresConfig.ConnectionInfo()),
 		models.WithLogMode(!appCfg.IsProd()),
-		models.WithCompany(appCfg.Pepper, appCfg.HMACKey),
+		models.WithUser(appCfg.Pepper, appCfg.HMACKey),
 		models.WithJobPost(),
 		models.WithOAuth(),
 	)
@@ -34,7 +34,7 @@ func main() {
 
 	defer services.Close()
 	must(services.DestructiveReset())
-	must(services.AutoMigrate())
+	//must(services.AutoMigrate())
 
 	mgCfg := appCfg.Mailgun
 	emailer := email.NewClient(
@@ -44,22 +44,23 @@ func main() {
 
 	r := mux.NewRouter()
 
-	jobsC := controllers.NewJobs()
+	jobsC := controllers.NewJobs(services.JobPost)
 
-	companyC := controllers.NewCompany(services.Company, emailer)
+	companyC := controllers.NewCompany(services.User, emailer)
 
 	//randBytes, err := rand.Bytes(32)
 	must(err)
 	//csrfMw := csrf.Protect(randBytes, csrf.Secure(appCfg.IsProd()))
 
 	userMw := middleware.Company{
-		CompanyService: services.Company,
+		UserService: services.User,
 	}
 	requireUserMw := middleware.RequireUser{
 		Company: userMw,
 	}
 
 	r.HandleFunc("/jobs", jobsC.List).Methods("GET")
+	r.HandleFunc("/jobs", jobsC.Create).Methods("POST")
 
 	r.HandleFunc("/company/signup", companyC.Create).Methods("POST")
 

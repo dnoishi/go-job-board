@@ -4,15 +4,21 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+type Location struct {
+	gorm.Model
+	LocationName string
+}
+
 // JobPost represents a job post
 type JobPost struct {
 	gorm.Model
-	UserID           uint   `gorm:"not_null;index"`
-	Title            string `gorm:"not_null"`
-	Location         string `gorm:"not_null"`
-	Category         string `gorm:"not_null"`
-	Description      string `gorm:"not_null"`
-	ApplicationEmail string `gorm:"not_null"`
+	UserID      uint     `gorm:"not_null;index" json:"userId"`
+	Title       string   `gorm:"not_null" json:"title"`
+	Location    Location `json:"location"`
+	LocationID  uint //`gorm:"not_null"`
+	Category    string `gorm:"not_null" json:"category"`
+	Description string `gorm:"not_null" json:"description"`
+	ApplyAt     string `gorm:"not_null" json:"applyAt"`
 }
 
 type JobPostService interface {
@@ -32,6 +38,7 @@ func NewJobPostService(db *gorm.DB) JobPostService {
 }
 
 type JobPostDB interface {
+	FindAll() ([]JobPost, error)
 	ByUserID(id uint) ([]JobPost, error)
 	ByID(id uint) (*JobPost, error)
 	Create(jobPost *JobPost) error
@@ -94,6 +101,16 @@ type jobPostGorm struct {
 	db *gorm.DB
 }
 
+func (jpg *jobPostGorm) FindAll() ([]JobPost, error) {
+	var jobPosts []JobPost
+	err := jpg.db.Find(&jobPosts).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return jobPosts, nil
+}
+
 // Create will create the provided jobPost and backfill data
 // like the ID, CreatedAt, and UpdatedAt fields.
 func (jpg *jobPostGorm) Create(jobPost *JobPost) error {
@@ -118,13 +135,13 @@ func (jpg *jobPostGorm) ByID(id uint) (*JobPost, error) {
 
 }
 func (jpg *jobPostGorm) ByUserID(id uint) ([]JobPost, error) {
-	var galleries []JobPost
-	err := jpg.db.Where("user_id = ?", id).Find(&galleries).Error
+	var jobPosts []JobPost
+	err := jpg.db.Where("user_id = ?", id).Find(&jobPosts).Error
 	if err != nil {
 		return nil, err
 	}
-	return galleries, nil
 
+	return jobPosts, nil
 }
 
 type jobPostValFunc func(*JobPost) error

@@ -1,64 +1,46 @@
 package controllers
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/samueldaviddelacruz/go-job-board/API/models"
 )
 
 type Jobs struct {
+	JobService models.JobPostService
 }
 
-func NewJobs() *Jobs {
-	return &Jobs{}
+func NewJobs(js models.JobPostService) *Jobs {
+	return &Jobs{
+		js,
+	}
 }
 
 // GET /jobs
 func (j *Jobs) List(w http.ResponseWriter, r *http.Request) {
-	mockJobs := []models.JobPost{
-		{
-			Title:    "React Developer",
-			Location: "Remote",
-			Category: "Web Development",
-			//Company:  "Netflix",
-		},
-		{
-			Title:    "Android Developer",
-			Location: "Germany",
-			Category: "Mobile",
-			//Company:  "Apple",
-		},
-		{
-			Title:    "Postgres DBA",
-			Location: "Ontario",
-			Category: "DBA/Devops",
-			//Company:  "Microsoft",
-		},
-		{
-			Title:    "Senior Automation QA",
-			Location: "NY",
-			Category: "QA",
-			//Company:  "Google",
-		},
-	}
+	jobs, err := j.JobService.FindAll()
+	if err != nil {
+		//vd.SetAlert(err)
 
-	respondJSON(w, http.StatusOK, mockJobs)
+		respondJSON(w, http.StatusInternalServerError, err)
+		return
+	}
+	respondJSON(w, http.StatusOK, jobs)
 }
 
 //POST /Create
 func (j *Jobs) Create(w http.ResponseWriter, r *http.Request) {
 
-	jobPost := models.JobPost{}
-	err := json.NewDecoder(r.Body).Decode(&jobPost)
-	if err != nil {
-		respondJSON(w, 404, "Could not read new Book")
+	jobPost := models.JobPost{
+		UserID:     1,
+		LocationID: 1,
+	}
+	parseJSON(w, r, &jobPost)
+
+	if err := j.JobService.Create(&jobPost); err != nil {
+		//vd.SetAlert(err)
+		respondJSON(w, http.StatusInternalServerError, "Could not create resource")
 		return
 	}
-	//isbn, err := CreateBook(a, book)
-	if err != nil {
-		respondJSON(w, 404, "Could not create new Book")
-		return
-	}
-	//respondJSON(w, 200, fmt.Sprintf("Created new Book with ISBN:%s", isbn))
+	respondJSON(w, http.StatusCreated, jobPost)
 }

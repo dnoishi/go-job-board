@@ -19,11 +19,11 @@ func WithGorm(dialect, connectionInfo string) ServicesConfig {
 	}
 }
 
-func WithCompany(pepper, hmacKey string) ServicesConfig {
+func WithUser(pepper, hmacKey string) ServicesConfig {
 
 	return func(s *Services) error {
 
-		s.Company = NewCompanyService(s.db, pepper, hmacKey)
+		s.User = NewUserService(s.db, pepper, hmacKey)
 		return nil
 	}
 }
@@ -64,7 +64,7 @@ func NewServices(cfgs ...ServicesConfig) (*Services, error) {
 
 type Services struct {
 	JobPost JobPostService
-	Company CompanyService
+	User    UserService
 	OAuth   OAuthService
 	db      *gorm.DB
 }
@@ -74,17 +74,49 @@ func (s *Services) Close() error {
 	return s.db.Close()
 }
 
-// AutoMigrate will attempt to automatically migrate the
+// AutoMigrate will attempt to automatically migrate
 // all tables
 func (s *Services) AutoMigrate() error {
-	return s.db.AutoMigrate(&Company{}, &JobPost{}, &pwReset{}, &OAuth{}).Error
+	err := s.db.AutoMigrate(&User{}, &Role{}, &Location{}, &JobPost{}, &pwReset{}, &OAuth{}).Error
+	if err != nil {
+		return err
+	}
+	return runPopulatingFuncs(s.seedRoles, s.seedLocations)
+}
+func (s *Services) seedRoles() error {
+	return s.db.Model(&Role{}).Create(&Role{RoleName: "Company"}).Create(&Role{RoleName: "Candidate"}).Error
+}
+
+func (s *Services) seedLocations() error {
+	return s.db.Model(&Location{}).
+		Create(&Location{LocationName: "USA"}).
+		Create(&Location{LocationName: "Canada"}).
+		Create(&Location{LocationName: "Europe"}).
+		Create(&Location{LocationName: "Remote"}).Error
 }
 
 // DestructiveReset drops the all tables and rebuilds them
 func (s *Services) DestructiveReset() error {
-	err := s.db.DropTableIfExists(&Company{}, &JobPost{}, &pwReset{}, &OAuth{}).Error
+	err := s.db.DropTableIfExists(
+		&User{},
+		&Role{},
+		&JobPost{},
+		&Location{},
+		&pwReset{},
+		&OAuth{}).Error
 	if err != nil {
 		return err
 	}
 	return s.AutoMigrate()
+}
+
+type populatingFunc func() error
+
+func runPopulatingFuncs(fns ...populatingFunc) error {
+	for _, fn := range fns {
+		if err := fn(); err != nil {
+			return err
+		}
+	}
+	return nil
 }

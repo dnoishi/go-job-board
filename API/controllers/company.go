@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/samueldaviddelacruz/go-job-board/API/email"
@@ -13,7 +12,7 @@ import (
 // This function will panic if the templates are not
 // parsed correctly, and should only be used during
 // initial setup
-func NewCompany(us models.CompanyService, emailer *email.Client) *Company {
+func NewCompany(us models.UserService, emailer *email.Client) *Company {
 	return &Company{
 		us:      us,
 		emailer: emailer,
@@ -22,14 +21,8 @@ func NewCompany(us models.CompanyService, emailer *email.Client) *Company {
 
 // Company Represents a Company controller
 type Company struct {
-	us      models.CompanyService
+	us      models.UserService
 	emailer *email.Client
-}
-
-type SignupForm struct {
-	Name     string `schema:"name"`
-	Email    string `schema:"email"`
-	Password string `schema:"password"`
 }
 
 // Create is used to process the signup form when a user
@@ -38,11 +31,15 @@ type SignupForm struct {
 // POST /signup
 func (u *Company) Create(w http.ResponseWriter, r *http.Request) {
 
-	company := models.Company{}
-	parseJSON(w, r, &company)
-	if err := u.us.Create(&company); err != nil {
+	companyUser := models.User{
+		RoleID: 1,
+	}
+
+	//company.
+	parseJSON(w, r, &companyUser)
+	if err := u.us.Create(&companyUser); err != nil {
 		//vd.SetAlert(err)
-		respondJSON(w, http.StatusInternalServerError, "Could not create resource")
+		respondJSON(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	/*
@@ -54,12 +51,9 @@ func (u *Company) Create(w http.ResponseWriter, r *http.Request) {
 		u.emailer.Welcome(user.Name, user.Email)
 	*/
 	//views.RedirectAlert(w, r, "/galleries", http.StatusFound, alert)
-	respondJSON(w, http.StatusCreated, fmt.Sprintf("Created resource with ID: %d", company.ID))
-}
+	//user2, _ := u.us.ByID(1)
 
-type LogingForm struct {
-	Email    string `schema:"email"`
-	Password string `schema:"password"`
+	respondJSON(w, http.StatusCreated, "resource created successfully")
 }
 
 // Login is used to verify the provided email address and
@@ -68,7 +62,7 @@ type LogingForm struct {
 // POST /login
 func (u *Company) Login(w http.ResponseWriter, r *http.Request) {
 
-	company := models.Company{}
+	company := models.User{}
 	parseJSON(w, r, &company)
 
 	_, err := u.us.Authenticate(company.Email, company.Password)
@@ -90,7 +84,8 @@ func (u *Company) Login(w http.ResponseWriter, r *http.Request) {
 		respondJSON(w, http.StatusInternalServerError, err)
 		return
 	}
-	respondJSON(w, http.StatusOK, "Success")
+	user2, _ := u.us.ByID(1)
+	respondJSON(w, http.StatusOK, user2)
 }
 
 // Logout is used to delete a users session cookie (remember_token)
@@ -188,7 +183,7 @@ func (u *Company) CompleteReset(w http.ResponseWriter, r *http.Request) {
 }
 
 // signIn is used to sign the given user via cookies.
-func (u *Company) signIn(w http.ResponseWriter, user *models.Company) error {
+func (u *Company) signIn(w http.ResponseWriter, user *models.User) error {
 	/*
 		if user.Remember == "" {
 			token, err := rand.RememberToken()

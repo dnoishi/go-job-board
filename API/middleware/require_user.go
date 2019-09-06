@@ -9,7 +9,7 @@ import (
 )
 
 type Company struct {
-	models.CompanyService
+	models.UserService
 }
 
 func (mw *Company) Apply(next http.Handler) http.HandlerFunc {
@@ -35,7 +35,7 @@ func (mw *Company) ApplyFn(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		user, err := mw.CompanyService.ByRemember(cookie.Value)
+		user, err := mw.UserService.ByRemember(cookie.Value)
 		if err != nil {
 			next(w, r)
 			return
