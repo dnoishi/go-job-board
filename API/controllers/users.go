@@ -1,26 +1,28 @@
 package controllers
 
 import (
+	"github.com/gorilla/mux"
 	"net/http"
+	"strconv"
 
 	"github.com/samueldaviddelacruz/go-job-board/API/email"
 
 	"github.com/samueldaviddelacruz/go-job-board/API/models"
 )
 
-// NewCompany is used to create a new Company controller.
+// NewUsers is used to create a new Users controller.
 // This function will panic if the templates are not
 // parsed correctly, and should only be used during
 // initial setup
-func NewCompany(us models.UserService, emailer *email.Client) *Company {
-	return &Company{
+func NewUsers(us models.UserService, emailer *email.Client) *Users {
+	return &Users{
 		us:      us,
 		emailer: emailer,
 	}
 }
 
-// Company Represents a Company controller
-type Company struct {
+// Users Represents a Users controller
+type Users struct {
 	us      models.UserService
 	emailer *email.Client
 }
@@ -33,11 +35,11 @@ type Credentials struct {
 // submits it. This is used to create a new user account.
 //
 // POST /signup
-func (u *Company) Create(w http.ResponseWriter, r *http.Request) {
+func (u *Users) Create(w http.ResponseWriter, r *http.Request) {
 
 	credentials := Credentials{
 	}
-	//company.
+
 	parseJSON(w, r, &credentials)
 	companyUser := models.User{
 		RoleID:   1,
@@ -50,25 +52,74 @@ func (u *Company) Create(w http.ResponseWriter, r *http.Request) {
 		respondJSON(w, http.StatusInternalServerError, err.Error())
 		return
 	}
-	/*
-		err := u.signIn(w, &user)
-		if err != nil {
-			http.Redirect(w, r, "/login", http.StatusFound)
-			return
-		}
-		u.emailer.Welcome(user.Name, user.Email)
-	*/
-	//views.RedirectAlert(w, r, "/galleries", http.StatusFound, alert)
-	//user2, _ := u.us.ByID(1)
 
 	respondJSON(w, http.StatusCreated, "resource created successfully")
+}
+
+// PUT /user/id
+func (u *Users) Update(w http.ResponseWriter, r *http.Request) {
+	companyUser, err := u.getUserByID(r, w)
+	if err != nil {
+		respondJSON(w, http.StatusInternalServerError, "Invalid user ID")
+		return
+	}
+
+	parseJSON(w, r, companyUser)
+
+	if err := u.us.Update(companyUser); err != nil {
+		//vd.SetAlert(err)
+		respondJSON(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondJSON(w, http.StatusCreated, "resource updated successfully")
+}
+
+// PUT /user/id/company-profile
+func (u *Users) UpdateCompanyProfile(w http.ResponseWriter, r *http.Request) {
+	companyUser, err := u.getUserByID(r, w)
+	if err != nil {
+		respondJSON(w, http.StatusInternalServerError, "Invalid user ID")
+		return
+	}
+	newCompanyProfile := &models.CompanyProfile{}
+	parseJSON(w, r, newCompanyProfile)
+	if companyUser.CompanyProfile == nil {
+		companyUser.CompanyProfile = &models.CompanyProfile{}
+	}
+	companyUser.CompanyProfile.Description = newCompanyProfile.Description
+	companyUser.CompanyProfile.Website = newCompanyProfile.Website
+	companyUser.CompanyProfile.CompanyLogoUrl = newCompanyProfile.CompanyLogoUrl
+	companyUser.CompanyProfile.FoundedYear = newCompanyProfile.FoundedYear
+
+	if err := u.us.Update(companyUser); err != nil {
+		respondJSON(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondJSON(w, http.StatusCreated, "resource updated successfully")
+}
+
+func (u *Users) getUserByID(r *http.Request, w http.ResponseWriter) (*models.User, error) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+
+		return nil, err
+	}
+	companyUser, err := u.us.ByID(uint(id))
+	if err != nil {
+
+		return nil, err
+	}
+	return companyUser, nil
 }
 
 // Login is used to verify the provided email address and
 // password and then log the user in if they are correct.
 //
 // POST /login
-func (u *Company) Login(w http.ResponseWriter, r *http.Request) {
+func (u *Users) Login(w http.ResponseWriter, r *http.Request) {
 	credentials := Credentials{
 	}
 
@@ -104,7 +155,7 @@ func (u *Company) Login(w http.ResponseWriter, r *http.Request) {
 // and then will update the user resource with a new remember
 // token.
 // POST /logout
-func (u *Company) Logout(w http.ResponseWriter, r *http.Request) {
+func (u *Users) Logout(w http.ResponseWriter, r *http.Request) {
 	/*
 		cookie := http.Cookie{
 			Name:     "remember_token",
@@ -131,7 +182,7 @@ type ResetPwForm struct {
 }
 
 // POST /forgot
-func (u *Company) InitiateReset(w http.ResponseWriter, r *http.Request) {
+func (u *Users) InitiateReset(w http.ResponseWriter, r *http.Request) {
 	//var vd views.Data
 	var form ResetPwForm
 	//vd.Yield = &form
@@ -164,7 +215,7 @@ func (u *Company) InitiateReset(w http.ResponseWriter, r *http.Request) {
 // CompleteReset processes the reset password form
 //
 //POST
-func (u *Company) CompleteReset(w http.ResponseWriter, r *http.Request) {
+func (u *Users) CompleteReset(w http.ResponseWriter, r *http.Request) {
 	//var vd views.Data
 	var form ResetPwForm
 	//vd.Yield = &form
@@ -195,7 +246,7 @@ func (u *Company) CompleteReset(w http.ResponseWriter, r *http.Request) {
 }
 
 // signIn is used to sign the given user via cookies.
-func (u *Company) signIn(w http.ResponseWriter, user *models.User) error {
+func (u *Users) signIn(w http.ResponseWriter, user *models.User) error {
 	/*
 		if user.Remember == "" {
 			token, err := rand.RememberToken()

@@ -28,8 +28,9 @@ const (
 
 	// ErrPasswordRequired is returned when a create is attempted
 	// without a user password provided.
-	ErrPasswordRequired modelError = "models: password is required"
-	ErrTitleRequired    modelError = "models: title is required"
+	ErrPasswordRequired    modelError = "models: password is required"
+	ErrTitleRequired       modelError = "models: title is required"
+	ErrDescriptionRequired modelError = "models: description is required"
 
 	ErrPwResetInvalid modelError = "models: token provided is not valid"
 
@@ -39,9 +40,10 @@ const (
 
 	// ErrRememberRequired is returned when a create or update is attempted
 	// without a user remember token hash.
-	ErrRememberRequired privateError = "models: remember is required"
-	ErrUserIDRequired   privateError = "models: user ID is required"
-
+	ErrRememberRequired   privateError = "models: remember is required"
+	ErrUserIDRequired     privateError = "models: user ID is required"
+	ErrLocationIDRequired privateError = "models: Location ID is required"
+	ErrCategoryIDRequired privateError = "models: Category ID is required"
 	// ErrIDInvalid is returned when an invalid ID is provided
 	// to a method like Delete.
 	ErrIDInvalid privateError = "models: ID provided was invalid"

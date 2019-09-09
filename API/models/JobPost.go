@@ -4,20 +4,10 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-type Category struct {
-	gorm.Model
-	CategoryName string
-}
-type Location struct {
-	gorm.Model
-	LocationName string
-}
-
 // JobPost represents a job post
 type JobPost struct {
 	gorm.Model
-	UserID uint `gorm:"not_null" json:"userId"`
-
+	UserID      uint      `gorm:"not_null" json:"userId"`
 	Title       string    `gorm:"not_null" json:"title"`
 	Location    *Location `json:"location,omitempty"`
 	LocationID  uint      `gorm:"not_null" json:"locationId"`
@@ -25,6 +15,7 @@ type JobPost struct {
 	CategoryID  uint      `gorm:"not_null" json:"categoryId"`
 	Description string    `gorm:"not_null" json:"description"`
 	ApplyAt     string    `gorm:"not_null" json:"applyAt"`
+	Skills      []Skill   `gorm:"many2many:job_post_skills;" json:"skills,omitempty"`
 }
 
 type JobPostService interface {
@@ -56,46 +47,78 @@ type jobPostValidator struct {
 	JobPostDB
 }
 
-func (gv *jobPostValidator) Create(jobPost *JobPost) error {
+func (jpv *jobPostValidator) Create(jobPost *JobPost) error {
 
 	err := runJobPostValFuncs(
-		jobPost, gv.userIDRequired, gv.titleRequired)
+		jobPost, jpv.userIDRequired, jpv.titleRequired, jpv.locationIDRequired, jpv.locationIDRequired, jpv.descriptionRequired, jpv.applyAtRequired)
+
 	if err != nil {
 		return err
 	}
-	return gv.JobPostDB.Create(jobPost)
+	return jpv.JobPostDB.Create(jobPost)
 }
 
-func (gv *jobPostValidator) Update(jobPost *JobPost) error {
+func (jpv *jobPostValidator) Update(jobPost *JobPost) error {
 
 	err := runJobPostValFuncs(
-		jobPost, gv.userIDRequired, gv.titleRequired)
+		jobPost, jpv.userIDRequired, jpv.titleRequired, jpv.locationIDRequired, jpv.locationIDRequired, jpv.descriptionRequired, jpv.applyAtRequired)
 	if err != nil {
 		return err
 	}
-	return gv.JobPostDB.Update(jobPost)
+	return jpv.JobPostDB.Update(jobPost)
 }
 
-func (gv *jobPostValidator) Delete(id uint) error {
+func (jpv *jobPostValidator) Delete(id uint) error {
 
 	if id <= 0 {
 		return ErrIDInvalid
 	}
 
-	return gv.JobPostDB.Delete(id)
+	return jpv.JobPostDB.Delete(id)
 }
 
-func (gv *jobPostValidator) userIDRequired(jp *JobPost) error {
+func (jpv *jobPostValidator) userIDRequired(jp *JobPost) error {
 	if jp.UserID <= 0 {
 		return ErrUserIDRequired
 	}
 
 	return nil
 }
+func (jpv *jobPostValidator) locationIDRequired(jp *JobPost) error {
+	if jp.LocationID <= 0 {
+		return ErrLocationIDRequired
+	}
 
-func (gv *jobPostValidator) titleRequired(jp *JobPost) error {
+	return nil
+}
+
+func (jpv *jobPostValidator) categoryIDRequired(jp *JobPost) error {
+	if jp.CategoryID <= 0 {
+		return ErrCategoryIDRequired
+	}
+
+	return nil
+}
+
+func (jpv *jobPostValidator) titleRequired(jp *JobPost) error {
 	if jp.Title == "" {
 		return ErrTitleRequired
+	}
+
+	return nil
+}
+
+func (jpv *jobPostValidator) descriptionRequired(jp *JobPost) error {
+	if jp.Description == "" {
+		return ErrDescriptionRequired
+	}
+
+	return nil
+}
+
+func (jpv *jobPostValidator) applyAtRequired(jp *JobPost) error {
+	if jp.ApplyAt == "" {
+		return ErrDescriptionRequired
 	}
 
 	return nil
@@ -120,7 +143,7 @@ func (jpg *jobPostGorm) FindAll() ([]JobPost, error) {
 // Create will create the provided jobPost and backfill data
 // like the ID, CreatedAt, and UpdatedAt fields.
 func (jpg *jobPostGorm) Create(jobPost *JobPost) error {
-	return jpg.db.Create(jobPost).Error
+	return jpg.db.Set("gorm:association_autoupdate", false).Create(jobPost).Error
 }
 
 func (jpg *jobPostGorm) Update(jobPost *JobPost) error {

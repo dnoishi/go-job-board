@@ -46,33 +46,65 @@ func main() {
 
 	jobsC := controllers.NewJobs(services.JobPost)
 
-	companyC := controllers.NewCompany(services.User, emailer)
+	usersC := controllers.NewUsers(services.User, emailer)
 
-	//randBytes, err := rand.Bytes(32)
 	must(err)
-	//csrfMw := csrf.Protect(randBytes, csrf.Secure(appCfg.IsProd()))
 
 	userMw := middleware.Company{
 		UserService: services.User,
 	}
-	requireUserMw := middleware.RequireUser{
-		Company: userMw,
-	}
-
-	r.HandleFunc("/jobs", jobsC.List).Methods("GET")
-	r.HandleFunc("/jobs", jobsC.Create).Methods("POST")
-
-	r.HandleFunc("/company/signup", companyC.Create).Methods("POST")
-
-	r.HandleFunc("/company/login", companyC.Login).Methods("POST")
-	r.HandleFunc("/company/logout", requireUserMw.ApplyFn(companyC.Logout)).Methods("POST")
-
-	r.HandleFunc("/company/forgot", companyC.InitiateReset).Methods("POST")
-
-	r.HandleFunc("/company/reset", companyC.CompleteReset).Methods("POST")
-
+	/*
+		requireUserMw := middleware.RequireUser{
+			Company: userMw,
+		}
+	*/
+	applyRoutes(r,
+		Route{
+			path:    "/jobs",
+			handler: jobsC.List,
+			method:  "GET",
+		},
+		Route{
+			path:    "/jobs",
+			handler: jobsC.Create,
+			method:  "POST",
+		},
+		Route{
+			path:    "/signup",
+			handler: usersC.Create,
+			method:  "POST",
+		},
+		Route{
+			path:    "/login",
+			handler: usersC.Login,
+			method:  "POST",
+		},
+		Route{
+			path:    "/user/{id:[0-9]+}",
+			handler: usersC.Update,
+			method:  "PUT",
+		},
+		Route{
+			path:    "/user/{id:[0-9]+}/company-profile",
+			handler: usersC.UpdateCompanyProfile,
+			method:  "PUT",
+		},
+	)
+	
 	fmt.Printf("Running on port :%d", appCfg.Port)
 	must(http.ListenAndServe(fmt.Sprintf(":%d", appCfg.Port), userMw.Apply(r)))
+}
+
+type Route struct {
+	path    string
+	handler func(http.ResponseWriter, *http.Request)
+	method  string
+}
+
+func applyRoutes(r *mux.Router, routes ...Route) {
+	for _, route := range routes {
+		r.HandleFunc(route.path, route.handler).Methods(route.method)
+	}
 }
 
 func must(err error) {

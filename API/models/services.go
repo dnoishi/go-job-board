@@ -83,12 +83,15 @@ func (s *Services) AutoMigrate() error {
 		&Location{},
 		&Category{},
 		&JobPost{},
+		&Skill{},
+		&CompanyProfile{},
+		&CompanyBenefit{},
 		&pwReset{},
 		&OAuth{}).Error
 	if err != nil {
 		return err
 	}
-	return runPopulatingFuncs(s.seedRoles, s.seedLocations, s.seedCategories)
+	return runPopulatingFuncs(s.seedRoles, s.seedLocations, s.seedCategories, s.seedSkills)
 }
 func (s *Services) seedRoles() error {
 	return s.db.Model(&Role{}).Create(&Role{RoleName: "Company"}).Create(&Role{RoleName: "Candidate"}).Error
@@ -110,6 +113,11 @@ func (s *Services) seedCategories() error {
 		Create(&Category{CategoryName: "DBA"}).
 		Create(&Category{CategoryName: "DevOps"}).Error
 }
+func (s *Services) seedSkills() error {
+	return s.db.Model(&Skill{}).
+		Create(&Skill{SkillName: "JavaScript"}).
+		Create(&Skill{SkillName: "Golang"}).Error
+}
 
 // DestructiveReset drops the all tables and rebuilds them
 func (s *Services) DestructiveReset() error {
@@ -119,6 +127,9 @@ func (s *Services) DestructiveReset() error {
 		&JobPost{},
 		&Category{},
 		&Location{},
+		&Skill{},
+		&CompanyProfile{},
+		&CompanyBenefit{},
 		&pwReset{},
 		&OAuth{}).Error
 	if err != nil {

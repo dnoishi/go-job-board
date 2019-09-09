@@ -9,6 +9,23 @@ import (
 	"time"
 )
 
+type CompanyBenefit struct {
+	gorm.Model
+	CompanyDetailsID uint
+	BenefitName      string `json:"benefitName,omitempty"`
+}
+
+type CompanyProfile struct {
+	UserID uint
+	gorm.Model
+	Website         string           `json:"website,omitempty"`
+	FoundedYear     uint             `json:"foundedYear,omitempty"`
+	Description     string           `json:"description,omitempty"`
+	CompanyBenefits []CompanyBenefit `json:"companyBenefits,omitempty"`
+	CompanyLogoUrl  string           `json:"companyLogoUrl,omitempty"`
+	Skills          []Skill          `gorm:"many2many:companyProfile_skills;" json:"skills,omitempty"`
+}
+
 // UserRole represents the user Role
 type Role struct {
 	gorm.Model
@@ -18,12 +35,13 @@ type Role struct {
 // User represents the User model stored in the database
 type User struct {
 	gorm.Model
-	Email        string    `gorm:"not null;unique_index" json:"email"`
-	PasswordHash string    `gorm:"not null" json:"-"`
-	Password     string    `json:"-"`
-	Role         *Role     `json:"-"`
-	RoleID       uint      `json:"roleId,omitempty"`
-	JobPosts     []JobPost `json:"jobPosts,omitempty"`
+	Email          string          `gorm:"not null;unique_index" json:"email"`
+	PasswordHash   string          `gorm:"not null" json:"-"`
+	Password       string          `json:"-"`
+	Role           *Role           `json:"-"`
+	RoleID         uint            `json:"roleId,omitempty"`
+	JobPosts       []JobPost       `json:"jobPosts,omitempty"`
+	CompanyProfile *CompanyProfile `json:"companyProfile,omitempty"`
 }
 
 // UserDB is used to interact with the users database.
@@ -232,7 +250,6 @@ func (uv *userValidator) Update(user *User) error {
 		uv.passwordMinLength,
 		uv.bcryptPassword,
 		uv.passwordHashRequired,
-
 		uv.normalizeEmail,
 		uv.requireEmail,
 		uv.emailFormat,
@@ -412,7 +429,7 @@ func (ug *userGorm) Create(user *User) error {
 // Update will update the provided user with all of the data
 // in the provided the user object.
 func (ug *userGorm) Update(user *User) error {
-	return ug.db.Save(user).Error
+	return ug.db.Set("gorm:association_autoupdate", false).Save(user).Error
 }
 
 // Delete will delete the user with the provided ID
