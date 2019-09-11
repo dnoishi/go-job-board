@@ -126,7 +126,7 @@ func (u *Users) AddCompanyProfileBenefit(w http.ResponseWriter, r *http.Request)
 		}
 	}
 
-	respondJSON(w, http.StatusCreated, "benefits updated successfully")
+	respondJSON(w, http.StatusCreated, "benefit added successfully")
 }
 
 // PUT /user/id/company-profile/remove-benefit
@@ -145,7 +145,27 @@ func (u *Users) RemoveCompanyProfileBenefit(w http.ResponseWriter, r *http.Reque
 		}
 	}
 
-	respondJSON(w, http.StatusCreated, "benefits updated successfully")
+	respondJSON(w, http.StatusCreated, "benefit removed successfully")
+}
+
+// PUT /user/id/company-profile/update-benefit
+func (u *Users) UpdateCompanyProfileBenefit(w http.ResponseWriter, r *http.Request) {
+	companyUser, err := u.getUserByID(r, w)
+	if err != nil {
+		respondJSON(w, http.StatusInternalServerError, err)
+		return
+	}
+	benefit := &models.CompanyBenefit{}
+	parseJSON(w, r, benefit)
+	if companyUser.CompanyProfile != nil {
+		benefit.CompanyProfileID = companyUser.CompanyProfile.ID
+		if err := u.us.UpdateCompanyProfileBenefit(benefit); err != nil {
+			respondJSON(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+	}
+
+	respondJSON(w, http.StatusCreated, "benefit updated successfully")
 }
 
 func (u *Users) getUserByID(r *http.Request, w http.ResponseWriter) (*models.User, error) {

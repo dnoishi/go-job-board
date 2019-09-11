@@ -67,6 +67,7 @@ type UserDB interface {
 	Delete(id uint) error
 	AddCompanyProfileBenefit(user *CompanyProfile, benefit CompanyBenefit) error
 	RemoveCompanyProfileBenefit(profile *CompanyProfile, benefit CompanyBenefit) error
+	UpdateCompanyProfileBenefit(benefit *CompanyBenefit) error
 }
 
 // UserService is a set of methods used to manipulate and work
@@ -447,6 +448,10 @@ func (ug *userGorm) AddCompanyProfileBenefit(profile *CompanyProfile, benefit Co
 
 func (ug *userGorm) RemoveCompanyProfileBenefit(profile *CompanyProfile, benefit CompanyBenefit) error {
 	return ug.db.Model(profile).Association("CompanyBenefits").Delete(benefit).Error
+}
+
+func (ug *userGorm) UpdateCompanyProfileBenefit(benefit *CompanyBenefit) error {
+	return ug.db.Save(benefit).Error
 }
 
 // first will query using the provided gorm.DB and it will

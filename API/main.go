@@ -110,6 +110,11 @@ func main() {
 			handler: usersC.RemoveCompanyProfileBenefit,
 			method:  "PUT",
 		},
+		Route{
+			path:    "/user/{id:[0-9]+}/company-profile/update-benefit",
+			handler: usersC.UpdateCompanyProfileBenefit,
+			method:  "PUT",
+		},
 	)
 
 	fmt.Printf("Running on port :%d", appCfg.Port)
