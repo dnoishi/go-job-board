@@ -163,6 +163,7 @@ func (jpg *jobPostGorm) ByID(id uint) (*JobPost, error) {
 	return &jobPost, err
 
 }
+
 func (jpg *jobPostGorm) ByUserID(id uint) ([]JobPost, error) {
 	var jobPosts []JobPost
 	err := jpg.db.Where("user_id = ?", id).Find(&jobPosts).Error

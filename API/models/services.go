@@ -36,6 +36,14 @@ func WithJobPost() ServicesConfig {
 	}
 }
 
+func WithSkill() ServicesConfig {
+
+	return func(s *Services) error {
+		s.Skill = NewSkillService(s.db)
+		return nil
+	}
+}
+
 func WithOAuth() ServicesConfig {
 	return func(s *Services) error {
 
@@ -65,6 +73,7 @@ func NewServices(cfgs ...ServicesConfig) (*Services, error) {
 type Services struct {
 	JobPost JobPostService
 	User    UserService
+	Skill   SkillsService
 	OAuth   OAuthService
 	db      *gorm.DB
 }

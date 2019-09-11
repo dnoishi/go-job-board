@@ -28,6 +28,7 @@ func main() {
 		models.WithLogMode(!appCfg.IsProd()),
 		models.WithUser(appCfg.Pepper, appCfg.HMACKey),
 		models.WithJobPost(),
+		models.WithSkill(),
 		models.WithOAuth(),
 	)
 	must(err)
@@ -46,8 +47,8 @@ func main() {
 
 	jobsC := controllers.NewJobs(services.JobPost)
 
-	usersC := controllers.NewUsers(services.User, emailer)
-
+	usersC := controllers.NewUsers(services.User, services.Skill)
+	authC := controllers.NewAuth(services.User, emailer)
 	must(err)
 
 	userMw := middleware.Company{
@@ -71,12 +72,12 @@ func main() {
 		},
 		Route{
 			path:    "/signup",
-			handler: usersC.Create,
+			handler: authC.Create,
 			method:  "POST",
 		},
 		Route{
 			path:    "/login",
-			handler: usersC.Login,
+			handler: authC.Login,
 			method:  "POST",
 		},
 		Route{
@@ -89,8 +90,28 @@ func main() {
 			handler: usersC.UpdateCompanyProfile,
 			method:  "PUT",
 		},
+		Route{
+			path:    "/user/{id:[0-9]+}/company-profile/add-skill",
+			handler: usersC.AddCompanyProfileSkill,
+			method:  "PUT",
+		},
+		Route{
+			path:    "/user/{id:[0-9]+}/company-profile/remove-skill",
+			handler: usersC.RemoveCompanyProfileSkill,
+			method:  "PUT",
+		},
+		Route{
+			path:    "/user/{id:[0-9]+}/company-profile/add-benefit",
+			handler: usersC.AddCompanyProfileBenefit,
+			method:  "PUT",
+		},
+		Route{
+			path:    "/user/{id:[0-9]+}/company-profile/remove-benefit",
+			handler: usersC.RemoveCompanyProfileBenefit,
+			method:  "PUT",
+		},
 	)
-	
+
 	fmt.Printf("Running on port :%d", appCfg.Port)
 	must(http.ListenAndServe(fmt.Sprintf(":%d", appCfg.Port), userMw.Apply(r)))
 }

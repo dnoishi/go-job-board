@@ -11,7 +11,7 @@ import (
 
 type CompanyBenefit struct {
 	gorm.Model
-	CompanyDetailsID uint
+	CompanyProfileID uint
 	BenefitName      string `json:"benefitName,omitempty"`
 }
 
@@ -65,6 +65,8 @@ type UserDB interface {
 	Create(user *User) error
 	Update(user *User) error
 	Delete(id uint) error
+	AddCompanyProfileBenefit(user *CompanyProfile, benefit CompanyBenefit) error
+	RemoveCompanyProfileBenefit(profile *CompanyProfile, benefit CompanyBenefit) error
 }
 
 // UserService is a set of methods used to manipulate and work
@@ -83,6 +85,7 @@ type UserService interface {
 	// provided email address.
 	InitiateReset(email string) (string, error)
 	CompleteReset(token, newPw string) (*User, error)
+
 	UserDB
 }
 
@@ -436,6 +439,14 @@ func (ug *userGorm) Update(user *User) error {
 func (ug *userGorm) Delete(id uint) error {
 	user := User{Model: gorm.Model{ID: id}}
 	return ug.db.Delete(&user).Error
+}
+
+func (ug *userGorm) AddCompanyProfileBenefit(profile *CompanyProfile, benefit CompanyBenefit) error {
+	return ug.db.Model(profile).Association("CompanyBenefits").Append(benefit).Error
+}
+
+func (ug *userGorm) RemoveCompanyProfileBenefit(profile *CompanyProfile, benefit CompanyBenefit) error {
+	return ug.db.Model(profile).Association("CompanyBenefits").Delete(benefit).Error
 }
 
 // first will query using the provided gorm.DB and it will
