@@ -1,24 +1,28 @@
 package controllers
 
 import (
+	"github.com/gorilla/mux"
 	"net/http"
+	"strconv"
 
 	"github.com/samueldaviddelacruz/go-job-board/API/models"
 )
 
 type Jobs struct {
-	JobService models.JobPostService
+	js models.JobPostService
+	ss models.SkillsService
 }
 
-func NewJobs(js models.JobPostService) *Jobs {
+func NewJobs(js models.JobPostService, ss models.SkillsService) *Jobs {
 	return &Jobs{
 		js,
+		ss,
 	}
 }
 
 // GET /jobs
 func (j *Jobs) List(w http.ResponseWriter, r *http.Request) {
-	jobs, err := j.JobService.FindAll()
+	jobs, err := j.js.FindAll()
 	if err != nil {
 		respondJSON(w, http.StatusInternalServerError, err)
 		return
@@ -26,7 +30,7 @@ func (j *Jobs) List(w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, http.StatusOK, jobs)
 }
 
-//POST /Create
+//POST /jobs
 func (j *Jobs) Create(w http.ResponseWriter, r *http.Request) {
 
 	jobPost := models.JobPost{
@@ -34,7 +38,7 @@ func (j *Jobs) Create(w http.ResponseWriter, r *http.Request) {
 	}
 	parseJSON(w, r, &jobPost)
 
-	if err := j.JobService.Create(&jobPost); err != nil {
+	if err := j.js.Create(&jobPost); err != nil {
 
 		respondJSON(w, http.StatusInternalServerError, "Could not create jobPost")
 		return
@@ -42,18 +46,74 @@ func (j *Jobs) Create(w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, http.StatusCreated, jobPost)
 }
 
-//POST /Update
+//PUT /jobs/id
 func (j *Jobs) Update(w http.ResponseWriter, r *http.Request) {
 
-	jobPost := models.JobPost{
-
+	jobPost, err := j.getJobByID(r)
+	if err != nil {
+		respondJSON(w, http.StatusInternalServerError, err.Error())
+		return
 	}
-	parseJSON(w, r, &jobPost)
 
-	if err := j.JobService.Update(&jobPost); err != nil {
+	parseJSON(w, r, jobPost)
+
+	if err := j.js.Update(jobPost); err != nil {
 
 		respondJSON(w, http.StatusInternalServerError, "Could not update jobPost")
 		return
 	}
 	respondJSON(w, http.StatusCreated, jobPost)
+}
+
+// PUT /jobs/id/add-skill
+func (j *Jobs) AddJobPostSkill(w http.ResponseWriter, r *http.Request) {
+
+	jobPost, err := j.getJobByID(r)
+	if err != nil {
+		respondJSON(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	skill := models.Skill{}
+	parseJSON(w, r, &skill)
+
+	if err := j.ss.AddSkillToOwner(jobPost, skill); err != nil {
+		respondJSON(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	respondJSON(w, http.StatusCreated, "skills updated successfully")
+}
+
+// PUT /user/id/remove-skill
+func (j *Jobs) RemoveJobPostSkill(w http.ResponseWriter, r *http.Request) {
+	jobPost, err := j.getJobByID(r)
+	if err != nil {
+		respondJSON(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	skill := models.Skill{}
+	parseJSON(w, r, &skill)
+
+	if err := j.ss.DeleteSkillFromOwner(jobPost, skill); err != nil {
+		respondJSON(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondJSON(w, http.StatusCreated, "skills updated successfully")
+}
+
+func (j *Jobs) getJobByID(r *http.Request) (*models.JobPost, error) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+
+		return nil, err
+	}
+	jobPost, err := j.js.ByID(uint(id))
+	if err != nil {
+
+		return nil, err
+	}
+	return jobPost, nil
 }

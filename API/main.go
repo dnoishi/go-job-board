@@ -45,7 +45,7 @@ func main() {
 
 	r := mux.NewRouter()
 
-	jobsC := controllers.NewJobs(services.JobPost)
+	jobsC := controllers.NewJobs(services.JobPost, services.Skill)
 
 	usersC := controllers.NewUsers(services.User, services.Skill)
 	authC := controllers.NewAuth(services.User, emailer)
@@ -60,16 +60,6 @@ func main() {
 		}
 	*/
 	applyRoutes(r,
-		Route{
-			path:    "/jobs",
-			handler: jobsC.List,
-			method:  "GET",
-		},
-		Route{
-			path:    "/jobs",
-			handler: jobsC.Create,
-			method:  "POST",
-		},
 		Route{
 			path:    "/signup",
 			handler: authC.Create,
@@ -115,6 +105,32 @@ func main() {
 			handler: usersC.UpdateCompanyProfileBenefit,
 			method:  "PUT",
 		},
+		Route{
+			path:    "/jobs",
+			handler: jobsC.List,
+			method:  "GET",
+		},
+		Route{
+			path:    "/jobs",
+			handler: jobsC.Create,
+			method:  "POST",
+		},
+		Route{
+			path:    "/jobs/{id:[0-9]+}",
+			handler: jobsC.Update,
+			method:  "PUT",
+		},
+		Route{
+			path:    "/jobs/{id:[0-9]+}/add-skill",
+			handler: jobsC.AddJobPostSkill,
+			method:  "PUT",
+		},
+		Route{
+			path:    "/jobs/{id:[0-9]+}/remove-skill",
+			handler: jobsC.RemoveJobPostSkill,
+			method:  "PUT",
+		},
+
 	)
 
 	fmt.Printf("Running on port :%d", appCfg.Port)

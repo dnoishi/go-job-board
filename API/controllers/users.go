@@ -31,7 +31,7 @@ type Credentials struct {
 
 // PUT /user/id
 func (u *Users) Update(w http.ResponseWriter, r *http.Request) {
-	companyUser, err := u.getUserByID(r, w)
+	companyUser, err := u.getUserByID(r)
 	if err != nil {
 		respondJSON(w, http.StatusInternalServerError, "Invalid user ID")
 		return
@@ -50,7 +50,7 @@ func (u *Users) Update(w http.ResponseWriter, r *http.Request) {
 
 // PUT /user/id/company-profile
 func (u *Users) UpdateCompanyProfile(w http.ResponseWriter, r *http.Request) {
-	companyUser, err := u.getUserByID(r, w)
+	companyUser, err := u.getUserByID(r)
 	if err != nil {
 		respondJSON(w, http.StatusInternalServerError, "Invalid user ID")
 		return
@@ -75,7 +75,7 @@ func (u *Users) UpdateCompanyProfile(w http.ResponseWriter, r *http.Request) {
 
 // PUT /user/id/company-profile/add-skill
 func (u *Users) AddCompanyProfileSkill(w http.ResponseWriter, r *http.Request) {
-	companyUser, err := u.getUserByID(r, w)
+	companyUser, err := u.getUserByID(r)
 	if err != nil {
 		respondJSON(w, http.StatusInternalServerError, err)
 		return
@@ -91,9 +91,9 @@ func (u *Users) AddCompanyProfileSkill(w http.ResponseWriter, r *http.Request) {
 	respondJSON(w, http.StatusCreated, "skills updated successfully")
 }
 
-// PUT /user/id/company-profile/add-skill
+// PUT /user/id/company-profile/remove-skill
 func (u *Users) RemoveCompanyProfileSkill(w http.ResponseWriter, r *http.Request) {
-	companyUser, err := u.getUserByID(r, w)
+	companyUser, err := u.getUserByID(r)
 	if err != nil {
 		respondJSON(w, http.StatusInternalServerError, "Invalid user ID")
 		return
@@ -112,7 +112,7 @@ func (u *Users) RemoveCompanyProfileSkill(w http.ResponseWriter, r *http.Request
 
 // PUT /user/id/company-profile/add-benefit
 func (u *Users) AddCompanyProfileBenefit(w http.ResponseWriter, r *http.Request) {
-	companyUser, err := u.getUserByID(r, w)
+	companyUser, err := u.getUserByID(r)
 	if err != nil {
 		respondJSON(w, http.StatusInternalServerError, err)
 		return
@@ -131,7 +131,7 @@ func (u *Users) AddCompanyProfileBenefit(w http.ResponseWriter, r *http.Request)
 
 // PUT /user/id/company-profile/remove-benefit
 func (u *Users) RemoveCompanyProfileBenefit(w http.ResponseWriter, r *http.Request) {
-	companyUser, err := u.getUserByID(r, w)
+	companyUser, err := u.getUserByID(r)
 	if err != nil {
 		respondJSON(w, http.StatusInternalServerError, err)
 		return
@@ -150,7 +150,7 @@ func (u *Users) RemoveCompanyProfileBenefit(w http.ResponseWriter, r *http.Reque
 
 // PUT /user/id/company-profile/update-benefit
 func (u *Users) UpdateCompanyProfileBenefit(w http.ResponseWriter, r *http.Request) {
-	companyUser, err := u.getUserByID(r, w)
+	companyUser, err := u.getUserByID(r)
 	if err != nil {
 		respondJSON(w, http.StatusInternalServerError, err)
 		return
@@ -168,7 +168,7 @@ func (u *Users) UpdateCompanyProfileBenefit(w http.ResponseWriter, r *http.Reque
 	respondJSON(w, http.StatusCreated, "benefit updated successfully")
 }
 
-func (u *Users) getUserByID(r *http.Request, w http.ResponseWriter) (*models.User, error) {
+func (u *Users) getUserByID(r *http.Request) (*models.User, error) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
